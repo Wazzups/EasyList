@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 
-  Widget SignupPage(BuildContext context) {
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: signupPage(context),
+    );
+  }
+
+  Widget signupPage(BuildContext context) {
     return new Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
@@ -63,7 +76,10 @@ import 'package:flutter/material.dart';
                     obscureText: true,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
-                      icon: Icon(Icons.mail_outline, color: Colors.red,),
+                      icon: Icon(
+                        Icons.mail_outline,
+                        color: Colors.red,
+                      ),
                       border: InputBorder.none,
                       hintText: 'example@gmail.com',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -99,7 +115,7 @@ import 'package:flutter/material.dart';
             alignment: Alignment.center,
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(      
+                bottom: BorderSide(
                     color: Colors.redAccent,
                     width: 0.5,
                     style: BorderStyle.solid),
@@ -115,7 +131,10 @@ import 'package:flutter/material.dart';
                     obscureText: true,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
-                      icon: Icon(Icons.lock_outline, color: Colors.red,),
+                      icon: Icon(
+                        Icons.lock_outline,
+                        color: Colors.red,
+                      ),
                       border: InputBorder.none,
                       hintText: '*********',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -163,11 +182,14 @@ import 'package:flutter/material.dart';
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 new Expanded(
-                  child: TextField(                    
+                  child: TextField(
                     obscureText: true,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
-                      icon: Icon(Icons.lock_outline, color: Colors.red,),
+                      icon: Icon(
+                        Icons.lock_outline,
+                        color: Colors.red,
+                      ),
                       border: InputBorder.none,
                       hintText: '*********',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -242,3 +264,4 @@ import 'package:flutter/material.dart';
       ),
     );
   }
+}

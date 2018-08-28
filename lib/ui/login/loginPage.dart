@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
+import '../../services/api.dart';
 
- Widget LoginPage(BuildContext context) {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  EasyListApi _api;
+  NetworkImage _profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  _loadFromFirebase() async {
+    final api = await EasyListApi.signInWithGoogle();
+    setState(() {
+      _api = api;
+      _profileImage = new NetworkImage(api.firebaseUser.photoUrl);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: loginPage(context));
+  }
+
+  Widget loginPage(BuildContext context) {
     return new Container(
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
@@ -63,7 +91,10 @@ import 'package:flutter/material.dart';
                     obscureText: true,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
-                      icon: Icon(Icons.mail_outline, color: Colors.red,),
+                      icon: Icon(
+                        Icons.mail_outline,
+                        color: Colors.red,
+                      ),
                       border: InputBorder.none,
                       hintText: 'example@gmail.com',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -115,7 +146,10 @@ import 'package:flutter/material.dart';
                     obscureText: true,
                     textAlign: TextAlign.left,
                     decoration: InputDecoration(
-                      icon: Icon(Icons.lock_outline, color: Colors.red,),
+                      icon: Icon(
+                        Icons.lock_outline,
+                        color: Colors.red,
+                      ),
                       border: InputBorder.none,
                       hintText: '*********',
                       hintStyle: TextStyle(color: Colors.grey),
@@ -238,6 +272,7 @@ import 'package:flutter/material.dart';
                                 children: <Widget>[
                                   new Expanded(
                                     child: new FlatButton(
+                                      onPressed: () {},
                                       padding: EdgeInsets.only(
                                         top: 15.0,
                                         bottom: 15.0,
@@ -291,6 +326,7 @@ import 'package:flutter/material.dart';
                                 children: <Widget>[
                                   new Expanded(
                                     child: new FlatButton(
+                                      onPressed: () => _loadFromFirebase(),
                                       padding: EdgeInsets.only(
                                         top: 15.0,
                                         bottom: 15.0,
@@ -332,3 +368,4 @@ import 'package:flutter/material.dart';
       ),
     );
   }
+}

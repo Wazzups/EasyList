@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'login/loginPage.dart';
 import 'home/home_page.dart';
+import 'login/loginPage.dart';
 import 'signup/signup_page.dart';
+import 'mainhome/mainhome.dart';
 
-class LoginScreen extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => LoginScreenState();
-}
-
-class LoginScreenState extends State<LoginScreen> {
+class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return HomePage(context);
+    return MaterialApp(
+      title: "EasyList",
+      home: MainHome(),
+    );
   }
 }

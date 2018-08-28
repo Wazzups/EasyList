@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "29194512273",
+    "firebase_url": "https://easylist-ee564.firebaseio.com",
+    "project_id": "easylist-ee564",
+    "storage_bucket": "easylist-ee564.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29194512273:android:9e262f333499830d",
+        "android_client_info": {
+          "package_name": "com.wazzups.easylist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29194512273-fi0260gl86kjpfgqc9oi391ivigu3rn1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wazzups.easylist",
+            "certificate_hash": "dededab106d5fb5e80c7d203c198a2ad2f5b2a56"
+          }
+        },
+        {
+          "client_id": "29194512273-kbpsupmqb8ci8umof5ftotmjvgrrvaai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhmc5LYpkuVamPGohfK089ccliTSgIckI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29194512273-kbpsupmqb8ci8umof5ftotmjvgrrvaai.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "29194512273-r6i13a4mk5tq27rou40ihb9d3nlt19jq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wazzups.easylist"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
