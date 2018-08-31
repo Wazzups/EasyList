@@ -2,14 +2,14 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-main() async {
-  print(get("d"));
-}
+class APIFoodrepo {
+  String apiKey = "dad55df826e17576d60de556feba3d99";
+  String urlFoodrepo = "https://www.foodrepo.org/api/v3/products?barcodes=";
 
-Future<dynamic> get(String url) async =>
-    http.get("https://www.foodrepo.org/api/v3/products?barcodes=7610848337010",
-        headers: {
-          "Authorization": "Token token=dad55df826e17576d60de556feba3d99"
-        }).then((response) {
-      print(jsonDecode(response.body));
-    });
+  Future<dynamic> getFoodInfo(String barcode) async {
+    http.Response response = await http.get("https://www.foodrepo.org/api/v3/products?barcodes=5053990101832",
+        headers: {"Authorization": "Token token=$apiKey"});
+      
+    return json.decode(response.body);
+  }
+}
