@@ -6,6 +6,7 @@ class Product {
   String name;
   String category;
   int discount;
+  
 
   Product({
     @required this.id,

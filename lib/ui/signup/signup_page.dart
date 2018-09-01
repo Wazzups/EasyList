@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
 import 'signup_data.dart';
@@ -12,6 +13,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   SignData _signUpData = new SignData();
+  FirebaseUser firebaseUser;
   final GlobalKey<FormState> _formKey =
       new GlobalKey<FormState>(); //formKey to validate InputFields data
 
@@ -54,22 +56,57 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // Register new user on firebase if form valid
-  Future validateAndSubmit() async {
+  Future<FirebaseUser> validateAndSubmit() async {
     if (submit()) {
       try {
-        FirebaseUser firebaseUser = await FirebaseAuth.instance
+        FirebaseUser firebaseUserAuth = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: this._signUpData.email,
                 password: this._signUpData.password);
-        debugPrint("Registered UID = " + firebaseUser.uid);
-        _formKey.currentState.reset();
-        var router = MaterialPageRoute(
-          builder: (BuildContext context) => LoginPage(),
-        );
-        Navigator.of(context).push(router);
+
+        this.firebaseUser = firebaseUserAuth;
       } catch (e) {
-        debugPrint(e);
+        debugPrint("User already registed");
+        var alertRegisted = new AlertDialog(
+          title: Text("User already registed"),
+          content: Text("Please Login or regist with different email"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+        showDialog(
+            context: context, builder: (BuildContext context) => alertRegisted);
+          firebaseUser = null;
+          return firebaseUser;
       }
+
+      if (this.firebaseUser != null) {
+        final QuerySnapshot resultQuery = await Firestore.instance
+            .collection("users")
+            .where('email', isEqualTo: this.firebaseUser.email)
+            .getDocuments();
+
+        final List<DocumentSnapshot> documents = resultQuery.documents;
+        if (documents.length == 0) {
+          Firestore.instance.document("users").setData({
+            'nickname': "firebaseUser.displayName",
+            'photoUrl': null,
+            'id': "this.firebaseUser.uid",
+            'email': this.firebaseUser.email
+          });
+        }
+      }
+
+      _formKey.currentState.reset();
+      var router = MaterialPageRoute(
+        builder: (BuildContext context) => LoginPage(),
+      );
+      Navigator.of(context).push(router);
     }
   }
 

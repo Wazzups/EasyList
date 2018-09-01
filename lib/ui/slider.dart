@@ -13,33 +13,35 @@ class _SliderPageState extends State<SliderPage> {
   @override
   void initState() {
     super.initState();
-    
 
     slides.add(
       new Slide(
-        title: "ERASER",
+        title: "EasyList",
         description:
-            "Allow miles wound place the leave had. To sitting subject no improve studied limited",
-        pathImage: "assets/images/list.jpg",
-        backgroundColor: 0xfff5a623,
+            "EasyList Allow people to share discount products and plan your day. Make To-Do's Whether it’s for work, school or home!",
+        pathImage: "assets/images/assignment.png",
+        widthImage: 150.0,
+        heightImage: 150.0,
+        marginDescription: EdgeInsets.only(top: 100.0),
+        backgroundColor: 0xFFE53935,
       ),
     );
     slides.add(
       new Slide(
-        title: "PENCIL",
+        title: "Barcode",
         description:
-            "Ye indulgence unreserved connection alteration appearance",
-        pathImage: "assets/images/list.jpg",
-        backgroundColor: 0xff203152,
+            "Barcode Scanner is the fastest and most user-friendly way to share discount products with the community",
+        pathImage: "assets/images/barcodescan.png",
+        backgroundColor: 0xFFE53935,
       ),
     );
     slides.add(
       new Slide(
-        title: "RULER",
+        title: "To-Do List",
         description:
-            "Much evil soon high in hope do view. Out may few northward believing attempted. Yet timed being songs marry one defer men our. Although finished blessing do of",
+            "Very simple To-Do List. You can add, edit and delete ToDos.",
         pathImage: "assets/images/list.jpg",
-        backgroundColor: 0xff9932CC,
+        backgroundColor: 0xFFE53935,
       ),
     );
   }
