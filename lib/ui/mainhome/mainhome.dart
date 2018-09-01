@@ -34,7 +34,7 @@ class _MainHomeState extends State<MainHome> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: (){}
+            onPressed: scan,
           ),
           IconButton(
             icon: Icon(Icons.filter_list),
@@ -46,7 +46,7 @@ class _MainHomeState extends State<MainHome> {
   }
 
 
-  Future scan() async {
+  Future scan2() async {
     try {
       String barcode = await BarcodeScanner.scan();
       setState(() {
@@ -66,6 +66,16 @@ class _MainHomeState extends State<MainHome> {
           'null (User returned using the "back"-button before scanning anything. Result)');
     } catch (e) {
       setState(() => this.barcode = 'Unknown error: $e');
+    }
+  }
+
+  Future scan() async {
+    try {
+      String barcode = await BarcodeScanner.scan();
+      Map _data = await apiFoodrepo.getFoodInfo(barcode);
+      print(_data.toString());
+    }catch(e){
+      debugPrint(e);
     }
   }
 }

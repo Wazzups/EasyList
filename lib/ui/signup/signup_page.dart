@@ -46,7 +46,6 @@ class _SignUpPageState extends State<SignUpPage> {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
 
-      print('Printing the signup data.');
       print('Email: ${_signUpData.email}');
       print('Password: ${_signUpData.password}');
       return true;

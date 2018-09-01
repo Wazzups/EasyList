@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/api_firebase.dart';
+import 'package:validate/validate.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -7,21 +9,69 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  EasyListApi _api;
+  final GlobalKey<FormState> _loginFormKey = new GlobalKey<FormState>();
+  FirebaseApi _api;
   NetworkImage _profileImage;
+  String _email;
+  String _password;
 
   @override
   void initState() {
     super.initState();
   }
 
-  _loadFromFirebase() async {
-    final api = await EasyListApi.signInWithGoogle();
+  _loadFromFirebaseGoogle() async {
+    final api = await FirebaseApi.signInWithGoogle();
+    debugPrint("Login GoogleUser UID = " + api.firebaseUser.uid);
     setState(() {
       _api = api;
       _profileImage = new NetworkImage(api.firebaseUser.photoUrl);
     });
   }
+
+
+  String _emailValidation(String value) {
+    try {
+      Validate.isEmail(value);
+    } catch (e) {
+      return 'The E-mail Address must be a valid email address.';
+    }
+    return null;
+  }
+
+  String _passwordValidation(String value) {
+    if (value.length < 8) return 'The Password must be at least 8 characters.';
+
+    return null;
+  }
+
+  bool validation() {
+    if (_loginFormKey.currentState.validate()) {
+      _loginFormKey.currentState.save();
+
+      print('Email: $_email');
+      print('Password: $_password');
+
+      return true;
+    }
+    return false;
+  }
+
+  validationAndLogin() async{
+    if (validation()) {
+      try {
+        FirebaseUser firebaseUser = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+        debugPrint("UserLogin UID = " + firebaseUser.uid);
+      } catch (e) {
+        debugPrint(e);
+        AlertDialog(
+
+        );
+      }
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,331 +90,340 @@ class _LoginPageState extends State<LoginPage> {
           fit: BoxFit.cover,
         ),
       ),
-      child: new ListView(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(50.0),
-            child: Center(
-              child: Icon(
-                Icons.assignment,
-                color: Colors.red,
-                size: 55.0,
-              ),
-            ),
-          ),
-          new Row(
-            children: <Widget>[
-              new Expanded(
-                child: new Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: new Text(
-                    "EMAIL",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontSize: 15.0,
-                    ),
-                  ),
+      child: Form(
+        key: _loginFormKey,
+        child: new ListView(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(50.0),
+              child: Center(
+                child: Icon(
+                  Icons.assignment,
+                  color: Colors.red,
+                  size: 55.0,
                 ),
               ),
-            ],
-          ),
-          new Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                    color: Colors.redAccent,
-                    width: 0.5,
-                    style: BorderStyle.solid),
-              ),
             ),
-            padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-            child: new Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
+            new Row(
               children: <Widget>[
                 new Expanded(
-                  child: TextField(
-                    obscureText: true,
-                    textAlign: TextAlign.left,
-                    decoration: InputDecoration(
-                      icon: Icon(
-                        Icons.mail_outline,
+                  child: new Padding(
+                    padding: const EdgeInsets.only(left: 40.0),
+                    child: new Text(
+                      "EMAIL",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                         color: Colors.red,
+                        fontSize: 15.0,
                       ),
-                      border: InputBorder.none,
-                      hintText: 'example@gmail.com',
-                      hintStyle: TextStyle(color: Colors.grey),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          Divider(
-            height: 24.0,
-          ),
-          new Row(
-            children: <Widget>[
-              new Expanded(
-                child: new Padding(
-                  padding: const EdgeInsets.only(left: 40.0),
-                  child: new Text(
-                    "PASSWORD",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          new Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                    color: Colors.redAccent,
-                    width: 0.5,
-                    style: BorderStyle.solid),
-              ),
-            ),
-            padding: const EdgeInsets.only(left: 0.0, right: 10.0),
-            child: new Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                new Expanded(
-                  child: TextField(
-                    obscureText: true,
-                    textAlign: TextAlign.left,
-                    decoration: InputDecoration(
-                      icon: Icon(
-                        Icons.lock_outline,
-                        color: Colors.red,
-                      ),
-                      border: InputBorder.none,
-                      hintText: '*********',
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 24.0,
-          ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(right: 20.0),
-                child: new FlatButton(
-                  child: new Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+            new Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
                       color: Colors.redAccent,
-                      fontSize: 15.0,
-                    ),
-                    textAlign: TextAlign.end,
-                  ),
-                  onPressed: () => {},
+                      width: 0.5,
+                      style: BorderStyle.solid),
                 ),
               ),
-            ],
-          ),
-          new Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
-            alignment: Alignment.center,
-            child: new Row(
+              padding: const EdgeInsets.only(left: 0.0, right: 10.0),
+              child: new Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  new Expanded(
+                    child: TextFormField(
+                      textAlign: TextAlign.left,
+                      decoration: InputDecoration(
+                        icon: Icon(
+                          Icons.mail_outline,
+                          color: Colors.red,
+                        ),
+                        border: InputBorder.none,
+                        hintText: 'example@gmail.com',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                      validator: _emailValidation,
+                      onSaved: (value) => this._email = value,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 24.0,
+            ),
+            new Row(
               children: <Widget>[
                 new Expanded(
-                  child: new FlatButton(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0),
-                    ),
-                    color: Colors.redAccent,
-                    onPressed: () => {},
-                    child: new Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 20.0,
-                        horizontal: 20.0,
+                  child: new Padding(
+                    padding: const EdgeInsets.only(left: 40.0),
+                    child: new Text(
+                      "PASSWORD",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                        fontSize: 15.0,
                       ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            new Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 40.0, right: 40.0, top: 0.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                      color: Colors.redAccent,
+                      width: 0.5,
+                      style: BorderStyle.solid),
+                ),
+              ),
+              padding: const EdgeInsets.only(left: 0.0, right: 10.0),
+              child: new Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  new Expanded(
+                    child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      obscureText: true,
+                      textAlign: TextAlign.left,
+                      decoration: InputDecoration(
+                        icon: Icon(
+                          Icons.lock_outline,
+                          color: Colors.red,
+                        ),
+                        border: InputBorder.none,
+                        hintText: '*********',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                      validator: _passwordValidation,
+                      onSaved: (value) => this._password = value,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 24.0,
+            ),
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
+                  child: new FlatButton(
+                    child: new Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                        fontSize: 15.0,
+                      ),
+                      textAlign: TextAlign.end,
+                    ),
+                    onPressed: () => {},
+                  ),
+                ),
+              ],
+            ),
+            new Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
+              alignment: Alignment.center,
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new FlatButton(
+                      shape: new RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0),
+                      ),
+                      color: Colors.redAccent,
+                      onPressed: validationAndLogin,
+                      child: new Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20.0,
+                          horizontal: 20.0,
+                        ),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            new Expanded(
+                              child: Text(
+                                "LOG IN",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            new Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
+              alignment: Alignment.center,
+              child: Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new Container(
+                      margin: EdgeInsets.all(8.0),
+                      decoration:
+                          BoxDecoration(border: Border.all(width: 0.25)),
+                    ),
+                  ),
+                  Text(
+                    "OR CONNECT WITH",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  new Expanded(
+                    child: new Container(
+                      margin: EdgeInsets.all(8.0),
+                      decoration:
+                          BoxDecoration(border: Border.all(width: 0.25)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            new Container(
+              width: MediaQuery.of(context).size.width,
+              margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
+              child: new Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new Container(
+                      margin: EdgeInsets.only(right: 8.0),
+                      alignment: Alignment.center,
                       child: new Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           new Expanded(
-                            child: Text(
-                              "LOG IN",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                            child: new FlatButton(
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0),
+                              ),
+                              color: Color(0Xff3B5998),
+                              onPressed: (){},
+                              child: new Container(
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Expanded(
+                                      child: new FlatButton(
+                                        onPressed: (){},
+                                        padding: EdgeInsets.only(
+                                          top: 15.0,
+                                          bottom: 15.0,
+                                        ),
+                                        child: new Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            Icon(
+                                              const IconData(0xea90,
+                                                  fontFamily: 'icomoon'),
+                                              color: Colors.white,
+                                              size: 15.0,
+                                            ),
+                                            Text(
+                                              "FACEBOOK",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          new Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
-            alignment: Alignment.center,
-            child: Row(
-              children: <Widget>[
-                new Expanded(
-                  child: new Container(
-                    margin: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(border: Border.all(width: 0.25)),
-                  ),
-                ),
-                Text(
-                  "OR CONNECT WITH",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                new Expanded(
-                  child: new Container(
-                    margin: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(border: Border.all(width: 0.25)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          new Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
-            child: new Row(
-              children: <Widget>[
-                new Expanded(
-                  child: new Container(
-                    margin: EdgeInsets.only(right: 8.0),
-                    alignment: Alignment.center,
-                    child: new Row(
-                      children: <Widget>[
-                        new Expanded(
-                          child: new FlatButton(
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0),
-                            ),
-                            color: Color(0Xff3B5998),
-                            onPressed: () => {},
-                            child: new Container(
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new FlatButton(
-                                      onPressed: () {},
-                                      padding: EdgeInsets.only(
-                                        top: 15.0,
-                                        bottom: 15.0,
-                                      ),
-                                      child: new Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: <Widget>[
-                                          Icon(
-                                            const IconData(0xea90,
-                                                fontFamily: 'icomoon'),
-                                            color: Colors.white,
-                                            size: 15.0,
-                                          ),
-                                          Text(
-                                            "FACEBOOK",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
+                  new Expanded(
+                    child: new Container(
+                      margin: EdgeInsets.only(left: 8.0),
+                      alignment: Alignment.center,
+                      child: new Row(
+                        children: <Widget>[
+                          new Expanded(
+                            child: new FlatButton(
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0),
+                              ),
+                              color: Color(0Xffdb3236),
+                              onPressed: () => {},
+                              child: new Container(
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    new Expanded(
+                                      child: new FlatButton(
+                                        onPressed: () => _loadFromFirebaseGoogle(),
+                                        padding: EdgeInsets.only(
+                                          top: 15.0,
+                                          bottom: 15.0,
+                                        ),
+                                        child: new Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            Icon(
+                                              const IconData(0xea88,
+                                                  fontFamily: 'icomoon'),
+                                              color: Colors.white,
+                                              size: 15.0,
+                                            ),
+                                            Text(
+                                              "GOOGLE",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                new Expanded(
-                  child: new Container(
-                    margin: EdgeInsets.only(left: 8.0),
-                    alignment: Alignment.center,
-                    child: new Row(
-                      children: <Widget>[
-                        new Expanded(
-                          child: new FlatButton(
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0),
-                            ),
-                            color: Color(0Xffdb3236),
-                            onPressed: () => {},
-                            child: new Container(
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  new Expanded(
-                                    child: new FlatButton(
-                                      onPressed: () => _loadFromFirebase(),
-                                      padding: EdgeInsets.only(
-                                        top: 15.0,
-                                        bottom: 15.0,
-                                      ),
-                                      child: new Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: <Widget>[
-                                          Icon(
-                                            const IconData(0xea88,
-                                                fontFamily: 'icomoon'),
-                                            color: Colors.white,
-                                            size: 15.0,
-                                          ),
-                                          Text(
-                                            "GOOGLE",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
