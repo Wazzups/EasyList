@@ -13,6 +13,7 @@ class _SliderPageState extends State<SliderPage> {
   @override
   void initState() {
     super.initState();
+    
 
     slides.add(
       new Slide(
