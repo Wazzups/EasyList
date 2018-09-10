@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import '../login/loginPage.dart';
-import '../signup/signup_page.dart';
+import '../register/registerPage.dart';
 
 class HomePage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: homePage(context),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        body: homePage(context),
+      );
 
   Widget homePage(BuildContext context) {
     return Container(
@@ -81,10 +79,8 @@ class HomePage extends StatelessWidget {
                     color: Colors.redAccent,
                     highlightedBorderColor: Colors.white,
                     onPressed: () {
-                      var router = MaterialPageRoute(
-                        builder: (BuildContext context) => SignUpPage(),
-                      );
-                      Navigator.of(context).push(router);
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) => SignUpPage()));
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -124,10 +120,8 @@ class HomePage extends StatelessWidget {
                     ),
                     color: Colors.white,
                     onPressed: () {
-                      var router = MaterialPageRoute(
-                        builder: (BuildContext context) => LoginPage(),
-                      );
-                      Navigator.of(context).push(router);
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) => LoginPage()));
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(

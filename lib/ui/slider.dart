@@ -1,6 +1,6 @@
 import 'package:intro_slider/intro_slider.dart';
 import 'package:flutter/material.dart';
-import 'home/home_page.dart';
+import 'entry/entryPage.dart';
 
 class SliderPage extends StatefulWidget {
   @override
@@ -47,17 +47,15 @@ class _SliderPageState extends State<SliderPage> {
   }
 
   void onDonePress() {
-    var router = MaterialPageRoute(
-      builder: (BuildContext context) => HomePage(),
-    );
-    Navigator.of(context).push(router);
+    Navigator
+        .of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
   }
 
   void onSkipPress() {
-    var router = MaterialPageRoute(
-      builder: (BuildContext context) => HomePage(),
-    );
-    Navigator.of(context).push(router);
+    Navigator
+        .of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
   }
 
   @override

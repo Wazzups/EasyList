@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
 class Product {
-  int id;  
+  String documentId;
   String barcode;
   String name;
   String category;
@@ -9,12 +9,20 @@ class Product {
   
 
   Product({
-    @required this.id,
+    @required this.documentId,
     @required this.barcode,
     @required this.name,
-    this.category = "",
+    @required this.category,
     @required this.discount,
 
   });
+
+  
+  @override
+  String toString() {
+    return "Product $barcode is named $name";
+  }
+
+
 
 }

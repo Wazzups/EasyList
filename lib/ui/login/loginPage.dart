@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../services/api_firebase.dart';
 import 'package:validate/validate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../home/home.dart';
+import '../../services/api_firebase.dart';
+import '../../services/api_firebaseUser.dart';
+import '../../services/api_products.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,8 +12,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  
   final GlobalKey<FormState> _loginFormKey = new GlobalKey<FormState>();
-  FirebaseApi _api;
+  FirebaseAPIUser _firebaseAPIUser;
   NetworkImage _profileImage;
   String _email;
   String _password;
@@ -21,14 +25,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _loadFromFirebaseGoogle() async {
-    final api = await FirebaseApi.signInWithGoogle();
-    debugPrint("Login GoogleUser UID = " + api.firebaseUser.uid);
+    final user = await FirebaseAPI.signInWithGoogle();
+    debugPrint("Login GoogleUser UID = " + user.uid);
     setState(() {
-      _api = api;
-      _profileImage = new NetworkImage(api.firebaseUser.photoUrl);
+      _firebaseAPIUser = FirebaseAPIUser(user);
+      _profileImage = new NetworkImage(_firebaseAPIUser.firebaseUser.photoUrl);
     });
+    if (user != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (BuildContext context) => new MainHome(ProductAPI(user))));
+    }
   }
-
 
   String _emailValidation(String value) {
     try {
@@ -57,21 +64,18 @@ class _LoginPageState extends State<LoginPage> {
     return false;
   }
 
-  validationAndLogin() async{
+  validationAndLogin() async {
     if (validation()) {
       try {
-        FirebaseUser firebaseUser = await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+        FirebaseUser firebaseUser = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: _email, password: _password);
         debugPrint("UserLogin UID = " + firebaseUser.uid);
       } catch (e) {
         debugPrint(e);
-        AlertDialog(
-
-        );
+        AlertDialog();
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -313,60 +317,6 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   new Expanded(
                     child: new Container(
-                      margin: EdgeInsets.only(right: 8.0),
-                      alignment: Alignment.center,
-                      child: new Row(
-                        children: <Widget>[
-                          new Expanded(
-                            child: new FlatButton(
-                              shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0),
-                              ),
-                              color: Color(0Xff3B5998),
-                              onPressed: (){},
-                              child: new Container(
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Expanded(
-                                      child: new FlatButton(
-                                        onPressed: (){},
-                                        padding: EdgeInsets.only(
-                                          top: 15.0,
-                                          bottom: 15.0,
-                                        ),
-                                        child: new Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            Icon(
-                                              const IconData(0xea90,
-                                                  fontFamily: 'icomoon'),
-                                              color: Colors.white,
-                                              size: 15.0,
-                                            ),
-                                            Text(
-                                              "FACEBOOK",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  new Expanded(
-                    child: new Container(
                       margin: EdgeInsets.only(left: 8.0),
                       alignment: Alignment.center,
                       child: new Row(
@@ -384,7 +334,8 @@ class _LoginPageState extends State<LoginPage> {
                                   children: <Widget>[
                                     new Expanded(
                                       child: new FlatButton(
-                                        onPressed: () => _loadFromFirebaseGoogle(),
+                                        onPressed: () =>
+                                            _loadFromFirebaseGoogle(),
                                         padding: EdgeInsets.only(
                                           top: 15.0,
                                           bottom: 15.0,

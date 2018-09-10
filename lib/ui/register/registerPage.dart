@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
-import 'signup_data.dart';
+import 'registerData.dart';
 import '../login/loginPage.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -56,7 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   // Register new user on firebase if form valid
-  Future<FirebaseUser> validateAndSubmit() async {
+  Future validateAndSubmit() async {
     if (submit()) {
       try {
         FirebaseUser firebaseUserAuth = await FirebaseAuth.instance
