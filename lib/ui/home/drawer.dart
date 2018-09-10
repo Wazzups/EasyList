@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import '../../services/api_products.dart';
+import '../about/aboutUsPage.dart';
 
 class SideDrawer extends StatefulWidget {
+  SideDrawer(this.productApi);
+
+  final ProductAPI productApi;
+
   @override
-  _SideDrawerState createState() => new _SideDrawerState();
+  _SideDrawerState createState() => new _SideDrawerState(this.productApi);
 }
 
 class _SideDrawerState extends State<SideDrawer> {
+  _SideDrawerState(this._productApiListener);
+
+  ProductAPI _productApiListener;
+
   @override
   void initState() {
     super.initState();
@@ -17,20 +27,13 @@ class _SideDrawerState extends State<SideDrawer> {
       child: new ListView(
         children: <Widget>[
           new UserAccountsDrawerHeader(
-            accountName: new Text("Burhanuddin Rashid"),
-            accountEmail: new Text("burhanrashid5253@gmail.com"),
-            otherAccountsPictures: <Widget>[
-              new IconButton(
-                  icon: new Icon(
-                    Icons.info,
-                    color: Colors.white,
-                    size: 36.0,
-                  ),
-                  onPressed: () {})
-            ],
+            decoration: BoxDecoration(color: Colors.redAccent),
+            accountName: new Text(_productApiListener.firebaseUser.displayName),
+            accountEmail: new Text(_productApiListener.firebaseUser.email),
             currentAccountPicture: new CircleAvatar(
-              backgroundColor: Theme.of(context).accentColor,
-              //backgroundImage: new AssetImage("assets/profile_pic.jpg"),
+              backgroundColor: Colors.redAccent,
+              backgroundImage:
+                  NetworkImage(_productApiListener.firebaseUser.photoUrl),
             ),
           ),
           new ListTile(
@@ -38,13 +41,20 @@ class _SideDrawerState extends State<SideDrawer> {
               title: new Text("Inbox"),
               onTap: () {}),
           new ListTile(
-              leading: new Icon(Icons.calendar_today),
-              title: new Text("Today"),
+              leading: new Icon(Icons.assignment),
+              title: new Text("ToDo"),
               onTap: () {}),
           new ListTile(
-            leading: new Icon(Icons.calendar_today),
-            title: new Text("Next 7 Days"),
-            onTap: () {},
+              leading: new Icon(Icons.person),
+              title: new Text("Profile"),
+              onTap: () {}),
+          new ListTile(
+            leading: new Icon(Icons.notifications),
+            title: new Text("About us"),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => AboutUsScreen()));
+            },
           ),
         ],
       ),

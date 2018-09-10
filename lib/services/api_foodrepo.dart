@@ -7,7 +7,7 @@ class APIFoodrepo {
   String urlFoodrepo = "https://www.foodrepo.org/api/v3/products?barcodes=";
 
   Future<dynamic> getFoodInfo(String barcode) async {
-    http.Response response = await http.get("https://www.foodrepo.org/api/v3/products?barcodes=5053990101832",
+    http.Response response = await http.get("https://www.foodrepo.org/api/v3/products?barcodes=$barcode",
         headers: {"Authorization": "Token token=$apiKey"});
       
     return json.decode(response.body);

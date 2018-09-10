@@ -6,4 +6,9 @@ class FirebaseAPIUser {
   FirebaseAPIUser(FirebaseUser user) {
     this.firebaseUser = user;
   }
+
+  @override
+    String toString() {
+      return "UserUid " + firebaseUser.uid + "Display Name " + firebaseUser.displayName;
+    }
 }
