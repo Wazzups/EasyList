@@ -1,22 +1,17 @@
-import 'package:easylist/services/api_products.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
  
-class ProfilePage extends StatefulWidget {
-  ProfilePage(this.firebaseUser);
-
+class ProfilePage extends StatefulWidget {  
   FirebaseUser firebaseUser;
+  ProfilePage(this.firebaseUser);
 
   @override
   _ProfilePageState createState() => new _ProfilePageState(this.firebaseUser);
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  _ProfilePageState(this.firebaseUserListener);
-
-  
   FirebaseUser firebaseUserListener;
-
+  _ProfilePageState(this.firebaseUserListener);
 
   @override
   void initState() {

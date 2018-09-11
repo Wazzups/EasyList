@@ -1,4 +1,6 @@
+import 'package:easylist/services/api_todo.dart';
 import 'package:easylist/ui/profile/profilePage.dart';
+import 'package:easylist/ui/todo/todoMain.dart';
 import 'package:flutter/material.dart';
 import '../../services/api_products.dart';
 import '../about/aboutUsPage.dart';
@@ -46,7 +48,13 @@ class _SideDrawerState extends State<SideDrawer> {
           new ListTile(
               leading: new Icon(Icons.assignment),
               title: new Text("ToDo"),
-              onTap: () {}),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            new ToDoMain(ToDoAPI(_productApiListener.firebaseUser))));
+              }),
           new ListTile(
               leading: new Icon(Icons.person),
               title: new Text("Profile"),
