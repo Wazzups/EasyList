@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:easylist/ui/entry/entryPage.dart';
 import 'package:easylist/ui/home/constantsPopUpButton.dart';
 import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
-import 'package:easylist/ui/product/addPage.dart';
-import 'package:easylist/ui/product/addProduct_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/api_foodrepo.dart';
@@ -189,10 +187,7 @@ class _MainHomeState extends State<MainHome> {
         ),
         mini: true,
         backgroundColor: Colors.redAccent,
-        onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (BuildContext context) => AddPage()));
-        },
+        onPressed: () {},
       ),
       body: new Container(
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),

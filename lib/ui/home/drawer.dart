@@ -1,4 +1,4 @@
-import 'package:easylist/ui/home/home.dart';
+import 'package:easylist/ui/profile/profilePage.dart';
 import 'package:flutter/material.dart';
 import '../../services/api_products.dart';
 import '../about/aboutUsPage.dart';
@@ -40,7 +40,9 @@ class _SideDrawerState extends State<SideDrawer> {
           new ListTile(
               leading: new Icon(Icons.inbox),
               title: new Text("Home"),
-              onTap: () {Navigator.pop(context);}),
+              onTap: () {
+                Navigator.pop(context);
+              }),
           new ListTile(
               leading: new Icon(Icons.assignment),
               title: new Text("ToDo"),
@@ -48,7 +50,13 @@ class _SideDrawerState extends State<SideDrawer> {
           new ListTile(
               leading: new Icon(Icons.person),
               title: new Text("Profile"),
-              onTap: () {}),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            ProfilePage(_productApiListener.firebaseUser)));
+              }),
           new ListTile(
             leading: new Icon(Icons.help),
             title: new Text("About us"),

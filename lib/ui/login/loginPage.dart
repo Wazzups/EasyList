@@ -14,7 +14,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _loginFormKey = new GlobalKey<FormState>();
   FirebaseAPIUser _firebaseAPIUser;
-  NetworkImage _profileImage;
   String _email;
   String _password;
 
@@ -28,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
     debugPrint("Login GoogleUser UID = " + user.uid);
     setState(() {
       _firebaseAPIUser = FirebaseAPIUser(user);
-      _profileImage = new NetworkImage(_firebaseAPIUser.firebaseUser.photoUrl);
     });
     if (user != null) {
       Navigator.push(
