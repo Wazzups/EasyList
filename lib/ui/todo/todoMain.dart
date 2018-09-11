@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easylist/models/todo.dart';
 import 'package:easylist/ui/entry/entryPage.dart';
 import 'package:easylist/ui/home/constantsPopUpButton.dart';
+import 'package:easylist/ui/todo/todoaddPage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/api_todo.dart';
@@ -60,7 +61,13 @@ class _ToDoMainState extends State<ToDoMain> {
     return new Card(
       color: Colors.redAccent.shade100,
       child: ListTile(
-        onTap: null,
+        onTap: (){
+          Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            new ToDoSecondMain(toDos.documentId)));
+        },
         leading: CircleAvatar(
           backgroundColor: Colors.redAccent,
           backgroundImage: NetworkImage(_todoApiListener.firebaseUser.photoUrl),
