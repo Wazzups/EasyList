@@ -19,11 +19,11 @@ class _SliderPageState extends State<SliderPage> {
         title: "EasyList",
         description:
             "EasyList Allow people to share discount products and plan your day. Make To-Do's Whether it’s for work, school or home!",
-        pathImage: "assets/images/assignment.png",
+        pathImage: "assets/images/share.png",
         widthImage: 150.0,
         heightImage: 150.0,
         marginDescription: EdgeInsets.only(top: 100.0),
-        backgroundColor: 0xFFE53935,
+        backgroundColor: 0xFFFF5252,
       ),
     );
     slides.add(
@@ -31,8 +31,11 @@ class _SliderPageState extends State<SliderPage> {
         title: "Barcode",
         description:
             "Barcode Scanner is the fastest and most user-friendly way to share discount products with the community",
-        pathImage: "assets/images/barcodescan.png",
-        backgroundColor: 0xFFE53935,
+        pathImage: "assets/images/barcodescan.png",        
+        widthImage: 200.0,
+        heightImage: 200.0,
+        marginDescription: EdgeInsets.only(top: 50.0),
+        backgroundColor: 0xFFFF5252,
       ),
     );
     slides.add(
@@ -40,8 +43,11 @@ class _SliderPageState extends State<SliderPage> {
         title: "To-Do List",
         description:
             "Very simple To-Do List. You can add, edit and delete ToDos.",
-        pathImage: "assets/images/list.jpg",
-        backgroundColor: 0xFFE53935,
+        pathImage: "assets/images/todo.png",
+        backgroundColor: 0xFFFF5252,
+        widthImage: 150.0,
+        heightImage: 150.0,
+        marginDescription: EdgeInsets.only(top: 100.0),
       ),
     );
   }

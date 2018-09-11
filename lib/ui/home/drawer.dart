@@ -1,3 +1,4 @@
+import 'package:easylist/ui/home/home.dart';
 import 'package:flutter/material.dart';
 import '../../services/api_products.dart';
 import '../about/aboutUsPage.dart';
@@ -38,8 +39,8 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           new ListTile(
               leading: new Icon(Icons.inbox),
-              title: new Text("Inbox"),
-              onTap: () {}),
+              title: new Text("Home"),
+              onTap: () {Navigator.pop(context);}),
           new ListTile(
               leading: new Icon(Icons.assignment),
               title: new Text("ToDo"),
@@ -49,7 +50,7 @@ class _SideDrawerState extends State<SideDrawer> {
               title: new Text("Profile"),
               onTap: () {}),
           new ListTile(
-            leading: new Icon(Icons.notifications),
+            leading: new Icon(Icons.help),
             title: new Text("About us"),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(

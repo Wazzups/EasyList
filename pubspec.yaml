@@ -42,14 +42,12 @@ flutter:
   assets:
    - assets/images/list.jpg
    - assets/images/straw1.jpg
-   - assets/images/straw2.jpg
    - assets/images/straw3.jpg
-   - assets/images/straw4.jpg
-   - assets/images/straw5.jpg
-   - assets/images/straw6.jpg
    - assets/images/assignment.png
    - assets/images/barcodescan.png
    - assets/images/facebook_logo.png
+   - assets/images/share.png
+   - assets/images/todo.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

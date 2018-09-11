@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -51,6 +52,8 @@ class _AddPageState extends State<AddPage> {
     print(_data.toString());
     print(_data["data"][0]["barcode"]);
     print(_data["data"][0]["display_name_translations"]["en"]);
+
+    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AddBarcodeProductScreen(_data["data"][0]["barcode"], _data["data"][0]["display_name_translations"]["en"])));
   }
 
   @override

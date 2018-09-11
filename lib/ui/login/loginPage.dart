@@ -12,7 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  
   final GlobalKey<FormState> _loginFormKey = new GlobalKey<FormState>();
   FirebaseAPIUser _firebaseAPIUser;
   NetworkImage _profileImage;
@@ -33,7 +32,10 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (user != null) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (BuildContext context) => new MainHome(ProductAPI(user))));
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  new MainHome(ProductAPI(user))));
     }
   }
 
@@ -312,67 +314,49 @@ class _LoginPageState extends State<LoginPage> {
             ),
             new Container(
               width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0),
-              child: new Row(
-                children: <Widget>[
-                  new Expanded(
-                    child: new Container(
-                      margin: EdgeInsets.only(left: 8.0),
-                      alignment: Alignment.center,
-                      child: new Row(
-                        children: <Widget>[
-                          new Expanded(
-                            child: new FlatButton(
-                              shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0),
-                              ),
-                              color: Color(0Xffdb3236),
-                              onPressed: () => {},
-                              child: new Container(
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new Expanded(
-                                      child: new FlatButton(
-                                        onPressed: () =>
-                                            _loadFromFirebaseGoogle(),
-                                        padding: EdgeInsets.only(
-                                          top: 15.0,
-                                          bottom: 15.0,
-                                        ),
-                                        child: new Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            Icon(
-                                              const IconData(0xea88,
-                                                  fontFamily: 'icomoon'),
-                                              color: Colors.white,
-                                              size: 15.0,
-                                            ),
-                                            Text(
-                                              "GOOGLE",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+              margin:
+                  const EdgeInsets.only(left: 100.0, right: 100.0, top: 20.0),
+              child: FlatButton(
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+                color: Color(0Xffdb3236),
+                onPressed: () {},
+                child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FlatButton(
+                        onPressed: () => _loadFromFirebaseGoogle(),
+                        padding: EdgeInsets.only(
+                          top: 15.0,
+                          bottom: 15.0,
+                        ),
+                        child: new Row(
+                          children: <Widget>[
+                            Icon(
+                              const IconData(0xea88, fontFamily: 'icomoon'),
+                              color: Colors.white,
+                              size: 15.0,
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: EdgeInsets.only(left: 5.0),
+                            ),
+                            Text(
+                              "GOOGLE",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),

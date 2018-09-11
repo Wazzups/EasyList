@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'package:easylist/ui/entry/entryPage.dart';
+import 'package:easylist/ui/home/constantsPopUpButton.dart';
+import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
 import 'package:easylist/ui/product/addPage.dart';
+import 'package:easylist/ui/product/addProduct_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/api_foodrepo.dart';
 import '../../models/product.dart';
 import 'drawer.dart';
 import '../../services/api_products.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter/services.dart';
 
 class MainHome extends StatefulWidget {
   final ProductAPI productApi;
@@ -20,7 +26,9 @@ class _MainHomeState extends State<MainHome> {
 
   List<Product> _products = [];
   ProductAPI _productApiListener;
-  FirebaseUser user;
+  FirebaseUser user;  
+  String barcode = "";  
+  APIFoodrepo apiFoodrepo = new APIFoodrepo();
 
   @override
   initState() {
@@ -34,7 +42,6 @@ class _MainHomeState extends State<MainHome> {
       _products = products;
     });
   }
-
 
   Future<Null> refresh() {
     _reloadProducts();
@@ -50,6 +57,44 @@ class _MainHomeState extends State<MainHome> {
     }
   }
 
+  
+  Future scan2() async {
+    try {
+      String barcode = await BarcodeScanner.scan();
+      setState(() {
+        this.barcode = barcode;
+        debugPrint("Barcode: $barcode");
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this.barcode = 'The user did not grant the camera permission!';
+        });
+      } else {
+        setState(() => this.barcode = 'Unknown error: $e');
+      }
+    } on FormatException {
+      setState(() => this.barcode =
+          'null (User returned using the "back"-button before scanning anything. Result)');
+    } catch (e) {
+      setState(() => this.barcode = 'Unknown error: $e');
+    }
+  }
+
+  Future scanning() async {
+    await scan2();
+    print("O barcode e " + barcode);
+    print("O this barcode e " + this.barcode);
+
+    Map _data = await apiFoodrepo.getFoodInfo(barcode);
+    print(_data.toString());
+    print(_data["data"][0]["barcode"]);
+    print(_data["data"][0]["display_name_translations"]["en"]);
+
+    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AddBarcodeProductScreen(_data["data"][0]["barcode"], _data["data"][0]["display_name_translations"]["en"])));
+  }
+
+
   Widget _buildProductItem(BuildContext context, int index) {
     Product product = _products[index];
     return new Container(
@@ -60,14 +105,33 @@ class _MainHomeState extends State<MainHome> {
           children: <Widget>[
             new ListTile(
               onTap: () {},
-              leading:
-                  new Hero(tag: index, child: Text("${product.discount}%")),
+              leading: new Hero(
+                  tag: index,
+                  child: CircleAvatar(
+                    child: Text(
+                      "${product.discount}%",
+                      style: TextStyle(
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )),
               title: new Text(
                 product.name,
                 style: new TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.black54),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                    fontSize: 16.0),
               ),
-              subtitle: new Text(product.barcode),
+              subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Text(product.category.toUpperCase()),
+                    new Text(
+                      "Barcode " + product.barcode,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ]),
               isThreeLine: true, // Less Cramped Tile
               dense: false, // Less Cramped Tile
             ),
@@ -97,26 +161,37 @@ class _MainHomeState extends State<MainHome> {
           },
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: (){},
-          ),
-          IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: (){},
+          PopupMenuButton<String>(
+            onSelected: choiceActionAppBar,
+            itemBuilder: (BuildContext context) {
+              return ConstantsAppbar.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
           )
         ],
       ),
       floatingActionButton: new FloatingActionButton(
-        child: new Icon(
-          Icons.add,
-          color: Colors.white,
+        child: PopupMenuButton<String>(
+          icon: Icon(Icons.add),
+          onSelected: choiceActionFloatingButton,
+          itemBuilder: (BuildContext context) {
+            return ConstantsFloatingButton.choices.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
         ),
-        backgroundColor: Colors.blue,
+        mini: true,
+        backgroundColor: Colors.redAccent,
         onPressed: () {
-          Navigator
-              .of(context)
-              .push(MaterialPageRoute(builder: (BuildContext context) => AddPage()));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (BuildContext context) => AddPage()));
         },
       ),
       body: new Container(
@@ -136,4 +211,28 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
+  void choiceActionAppBar(String choice) async {
+    if (choice == ConstantsAppbar.Settings) {
+      print('Settings');
+    } else if (choice == ConstantsAppbar.SignOut) {
+      await _signOut();
+    }
+  }
+
+  void choiceActionFloatingButton(String choice) {
+    if (choice == ConstantsFloatingButton.Manual) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AddBarcodeProductScreen("", "")));
+    } else if (choice == ConstantsFloatingButton.Barcode) {
+      scanning();
+    }
+  }
+
+  Future _signOut() async {
+    final user = await FirebaseAuth.instance.currentUser();
+    print(user.email);
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context) => HomePage()), (Route<dynamic> route) => false);
+    
+  }
 }

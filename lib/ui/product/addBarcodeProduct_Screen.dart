@@ -2,15 +2,23 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class AddProductScreen extends StatefulWidget {
+class AddBarcodeProductScreen extends StatefulWidget {
+  final String barcode;
+  final String productName;
+
+  AddBarcodeProductScreen(this.barcode, this.productName);
+
   @override
-  _AddProductScreenState createState() => new _AddProductScreenState();
+  _AddBarcodeProductScreenState createState() =>
+      new _AddBarcodeProductScreenState(this.barcode, this.productName);
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
-  String productName = "";
+class _AddBarcodeProductScreenState extends State<AddBarcodeProductScreen> {
+  _AddBarcodeProductScreenState(this.barcodesState, this.productNameState);
+
+  String productNameState;
+  String barcodesState;
   String category = "";
-  String barcode = "";
   int discount;
   int dueDate = new DateTime.now().millisecondsSinceEpoch;
   GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
@@ -36,6 +44,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 new ListTile(
                   leading: new Icon(Icons.label),
                   title: new TextFormField(
+                      initialValue: productNameState != "" ? productNameState : "",
                       validator: (value) {
                         var msg = value.isEmpty
                             ? "Product Name Cannot be Empty"
@@ -43,12 +52,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         return msg;
                       },
                       onSaved: (value) {
-                        productName = value;
+                        productNameState = value;
                       },
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
-                      decoration:
-                          new InputDecoration(hintText: "Product Name")),
+                      decoration: new InputDecoration(
+                          hintText: productNameState != ""
+                              ? "$productNameState"
+                              : "Product Name")),
                 ),
                 new ListTile(
                   leading: new Icon(Icons.turned_in),
@@ -83,17 +94,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 new ListTile(
                   leading: new Icon(Icons.view_column),
                   title: new TextFormField(
+                      initialValue: barcodesState != "" ? barcodesState : "",
                       validator: (value) {
                         var msg =
                             value.isEmpty ? "Barcode Cannot be Empty" : null;
                         return msg;
                       },
                       onSaved: (value) {
-                        barcode = value;
+                        barcodesState = value;
                       },
                       maxLines: null,
                       keyboardType: TextInputType.number,
-                      decoration: new InputDecoration(hintText: "Barcode")),
+                      decoration: new InputDecoration(
+                          hintText: barcodesState != ""
+                              ? "$barcodesState"
+                              : "Barcode")),
                 ),
               ],
             ),
@@ -107,14 +122,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
           onPressed: () {
             if (_formState.currentState.validate()) {
               _formState.currentState.save();
+              print("name" + this.productNameState + " " + barcodesState + " " + category + " " + "${discount.toString()}");
 
               Firestore.instance.runTransaction((transaction) async {
                 await transaction
                     .set(Firestore.instance.collection("products").document(), {
-                  'name': productName,
+                  'name': productNameState,
                   'category': category,
                   'discount': discount,
-                  'barcode': barcode,
+                  'barcode': barcodesState,
                 });
               });
 
@@ -122,18 +138,5 @@ class _AddProductScreenState extends State<AddProductScreen> {
             }
           }),
     );
-  }
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(2015, 8),
-        lastDate: new DateTime(2101));
-    if (picked != null) {
-      setState(() {
-        dueDate = picked.millisecondsSinceEpoch;
-      });
-    }
   }
 }
