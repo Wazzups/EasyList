@@ -4,6 +4,7 @@ import 'package:easylist/ui/home/constantsPopUpButton.dart';
 import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../services/api_foodrepo.dart';
 import '../../models/product.dart';
 import 'drawer.dart';
@@ -24,8 +25,8 @@ class _MainHomeState extends State<MainHome> {
 
   List<Product> _products = [];
   ProductAPI _productApiListener;
-  FirebaseUser user;  
-  String barcode = "";  
+  FirebaseUser user;
+  String barcode = "";
   APIFoodrepo apiFoodrepo = new APIFoodrepo();
 
   @override
@@ -55,7 +56,6 @@ class _MainHomeState extends State<MainHome> {
     }
   }
 
-  
   Future scan2() async {
     try {
       String barcode = await BarcodeScanner.scan();
@@ -89,9 +89,11 @@ class _MainHomeState extends State<MainHome> {
     print(_data["data"][0]["barcode"]);
     print(_data["data"][0]["display_name_translations"]["en"]);
 
-    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AddBarcodeProductScreen(_data["data"][0]["barcode"], _data["data"][0]["display_name_translations"]["en"])));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => AddBarcodeProductScreen(
+            _data["data"][0]["barcode"],
+            _data["data"][0]["display_name_translations"]["en"])));
   }
-
 
   Widget _buildProductItem(BuildContext context, int index) {
     Product product = _products[index];
@@ -180,7 +182,9 @@ class _MainHomeState extends State<MainHome> {
             return ConstantsFloatingButton.choices.map((String choice) {
               return PopupMenuItem<String>(
                 value: choice,
-                child: Text(choice),
+                child: choice == "Manual"
+                    ? Center(child: Icon(Icons.pan_tool))
+                    : Center(child: Icon(FontAwesomeIcons.barcode)),
               );
             }).toList();
           },
@@ -216,7 +220,8 @@ class _MainHomeState extends State<MainHome> {
 
   void choiceActionFloatingButton(String choice) {
     if (choice == ConstantsFloatingButton.Manual) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AddBarcodeProductScreen("", "")));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) => AddBarcodeProductScreen("", "")));
     } else if (choice == ConstantsFloatingButton.Barcode) {
       scanning();
     }
@@ -227,7 +232,9 @@ class _MainHomeState extends State<MainHome> {
     print(user.email);
     await FirebaseAuth.instance.signOut();
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context) => HomePage()), (Route<dynamic> route) => false);
-    
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+        (Route<dynamic> route) => false);
   }
 }
