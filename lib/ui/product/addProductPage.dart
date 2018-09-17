@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easylist/ui/home/home.dart';
 import '../../services/api_products.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 // * Pagina com o formulário para adicionar produtos
 class AddProductScreen extends StatefulWidget {
@@ -23,12 +24,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _formState = new GlobalKey<FormState>();
-  int dueDate = new DateTime.now().millisecondsSinceEpoch;
+  var format = new intl.DateFormat.yMMMMd("en_US");
   FirebaseUser firebaseUser;
   String productNameState;
   String barcodesState;
   String local = "";
-  String price = "";
+  double price = 1.0;
   int discount;
 
   @override
@@ -70,7 +71,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
           _formState.currentState.save();
 
           Firestore.instance.runTransaction((transaction) async {
-            var format = new intl.DateFormat.yMMMMd("en_US");
             var dateTimeNowString = format.format(DateTime.now());
             await transaction
                 .set(Firestore.instance.collection("products").document(), {
@@ -111,17 +111,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   color: Colors.red,
                 ),
                 title: new TextFormField(
-                  keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.text,
                     initialValue:
                         productNameState != "" ? productNameState : "",
-                    validator: (value) {
-                      var msg =
-                          value.isEmpty ? "Product Name Cannot be Empty" : null;
-                      return msg;
-                    },
-                    onSaved: (value) {
-                      productNameState = value;
-                    },
+                    validator: (value) =>
+                        value.isEmpty ? "Product Name Cannot be Empty" : null,
+                    onSaved: (value) => productNameState = value,
                     maxLines: null,
                     decoration: new InputDecoration(
                         hintText: productNameState != ""
@@ -134,16 +129,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   color: Colors.red,
                 ),
                 title: new TextFormField(
-                  keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.number,
                     initialValue: barcodesState != "" ? barcodesState : "",
-                    validator: (value) {
-                      var msg =
-                          value.isEmpty ? "Barcode Cannot be Empty" : null;
-                      return msg;
-                    },
-                    onSaved: (value) {
-                      barcodesState = value;
-                    },
+                    validator: (value) =>
+                        value.isEmpty ? "Barcode Cannot be Empty" : null,
+                    onSaved: (value) => barcodesState = value,
                     maxLines: null,
                     decoration: new InputDecoration(
                         hintText: barcodesState != ""
@@ -156,13 +146,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   color: Colors.red,
                 ),
                 title: new TextFormField(
-                    validator: (value) {
-                      var msg = value.isEmpty ? "Local Cannot be Empty" : null;
-                      return msg;
-                    },
-                    onSaved: (value) {
-                      local = value;
-                    },
+                    validator: (value) =>
+                        value.isEmpty ? "Local Cannot be Empty" : null,
+                    onSaved: (value) => local = value,
                     maxLines: null,
                     keyboardType: TextInputType.multiline,
                     decoration: new InputDecoration(hintText: "Local")),
@@ -173,14 +159,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   color: Colors.red,
                 ),
                 title: new TextFormField(
-                    validator: (value) {
-                      var msg =
-                          value.isEmpty ? "Discount Cannot be Empty" : null;
-                      return msg;
-                    },
-                    onSaved: (value) {
-                      discount = int.parse(value);
-                    },
+                    validator: (value) =>
+                        value.isEmpty ? "Discount Cannot be Empty" : null,
+                    onSaved: (value) => discount = int.parse(value),
                     maxLines: null,
                     keyboardType: TextInputType.number,
                     decoration: new InputDecoration(hintText: "Discount")),
@@ -191,13 +172,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   color: Colors.red,
                 ),
                 title: new TextFormField(
-                    validator: (value) {
-                      var msg = value.isEmpty ? "Price Cannot be Empty" : null;
-                      return msg;
-                    },
-                    onSaved: (value) {
-                      price = value;
-                    },
+                    validator: (value) =>
+                        value.isEmpty ? "Price Cannot be Empty" : null,
+                    onSaved: (value) => price = value,
                     maxLines: null,
                     keyboardType: TextInputType.number,
                     decoration: new InputDecoration(hintText: "Price")),
@@ -208,5 +185,24 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ),
       ],
     );
+  }
+
+
+ void _showDialog() {
+    showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return new NumberPickerDialog.decimal(
+          minValue: 1,
+          maxValue: 10,
+          title: new Text("Pick a new price"),
+          initialDoubleValue: price,
+        );
+      }
+    ).then((int value)) {
+      if (value != null) {
+        setState(() => price = value);
+      }
+    });
   }
 }

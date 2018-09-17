@@ -1,4 +1,4 @@
-import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
+import 'package:easylist/ui/product/addProductPage.dart';
 import 'package:flutter/material.dart';
 
 // * Pagina que exibe a informação do produto lido
@@ -46,10 +46,8 @@ class _ProductReadPageState extends State<ProductReadPage> {
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.delete),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        )
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ],
     );
   }
@@ -88,9 +86,7 @@ class _ProductReadPageState extends State<ProductReadPage> {
                   Icons.share,
                   color: Colors.white,
                 ),
-                onPressed: () {
-                  print("share");
-                },
+                onPressed: () {},
               )),
           ListTile(
             title: Text(this.barcodesState),
@@ -105,19 +101,17 @@ class _ProductReadPageState extends State<ProductReadPage> {
     );
   }
 
-  FloatingActionButton floatingActionProductInfo(){
+  FloatingActionButton floatingActionProductInfo() {
     return FloatingActionButton(
-        child: Icon(
-          Icons.check,
-          size: 30.0,
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.red,
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => AddProductScreen(
-                  this.barcodesState, this.productNameState)));
-        },
-      );
+      child: Icon(
+        Icons.check,
+        size: 30.0,
+        color: Colors.white,
+      ),
+      backgroundColor: Colors.red,
+      onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) =>
+              AddProductScreen(this.barcodesState, this.productNameState))),
+    );
   }
 }

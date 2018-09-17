@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:easylist/services/api_firebase.dart';
 import 'package:easylist/ui/home/constantsPopUpButton.dart';
-import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
+import 'package:easylist/ui/product/addProductPage.dart';
 import 'package:easylist/ui/product/productReadInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

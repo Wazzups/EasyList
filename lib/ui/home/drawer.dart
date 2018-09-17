@@ -2,13 +2,14 @@ import 'package:easylist/services/api_todo.dart';
 import 'package:easylist/ui/profile/profilePage.dart';
 import 'package:easylist/ui/todo/todoMain.dart';
 import 'package:flutter/material.dart';
+import 'package:easylist/services/api_firebase.dart';
 import '../../services/api_products.dart';
 import '../about/aboutUsPage.dart';
 
 class SideDrawer extends StatefulWidget {
-  SideDrawer(this.productApi);
-
   final ProductAPI productApi;
+
+  SideDrawer(this.productApi);
 
   @override
   _SideDrawerState createState() => new _SideDrawerState(this.productApi);
@@ -29,49 +30,69 @@ class _SideDrawerState extends State<SideDrawer> {
     return new Drawer(
       child: new ListView(
         children: <Widget>[
-          new UserAccountsDrawerHeader(
+          UserAccountsDrawerHeader(
             decoration: BoxDecoration(color: Colors.redAccent),
-            accountName: new Text(_productApiListener.firebaseUser.displayName),
-            accountEmail: new Text(_productApiListener.firebaseUser.email),
-            currentAccountPicture: new CircleAvatar(
+            accountName: Text(
+              _productApiListener.firebaseUser.displayName,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+            ),
+            accountEmail: Text(_productApiListener.firebaseUser.email),
+            currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.redAccent,
               backgroundImage:
                   NetworkImage(_productApiListener.firebaseUser.photoUrl),
             ),
           ),
-          new ListTile(
-              leading: new Icon(Icons.inbox),
-              title: new Text("Home"),
-              onTap: () {
-                Navigator.pop(context);
-              }),
-          new ListTile(
-              leading: new Icon(Icons.assignment),
-              title: new Text("ToDo"),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            new ToDoMain(ToDoAPI(_productApiListener.firebaseUser))));
-              }),
-          new ListTile(
-              leading: new Icon(Icons.person),
-              title: new Text("Profile"),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            ProfilePage(_productApiListener.firebaseUser)));
-              }),
-          new ListTile(
-            leading: new Icon(Icons.help),
-            title: new Text("About us"),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => AboutUsScreen()));
-            },
+          ListTile(
+            leading: Icon(
+              Icons.inbox,
+              color: Colors.redAccent,
+            ),
+            title: Text(
+              "Home",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () => Navigator.pop(context),
+          ),
+          ListTile(
+            leading: Icon(Icons.assignment, color: Colors.redAccent),
+            title: Text(
+              "ToDo",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => new ToDoMain(
+                        ToDoAPI(_productApiListener.firebaseUser)))),
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: Colors.redAccent),
+            title: Text(
+              "Profile",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        ProfilePage(_productApiListener.firebaseUser))),
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app, color: Colors.redAccent),
+            title: Text(
+              "Sign up",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () => FirebaseAPI.signOut(context),
+          ),
+          ListTile(
+            leading: Icon(Icons.help, color: Colors.redAccent),
+            title: Text("About",
+                style:
+                    TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => AboutUsScreen())),
           ),
         ],
       ),
