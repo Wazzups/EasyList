@@ -30,10 +30,14 @@ class ProductAPI {
 
     return new Product(
       documentId: snapshot.documentID,
-      name: data['name'],
       barcode: data["barcode"],
-      category: data["category"],
+      likes: data["likes"],
+      local: data["local"],
+      name: data['name'],
+      price: data["price"],
       discount: data["discount"],
+      uid: data["uid"],
+      userEmail: data["user"],
     );
   }
 }

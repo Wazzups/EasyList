@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:easylist/ui/entry/entryPage.dart';
 
 class FirebaseAPI {
   static FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,9 +28,19 @@ class FirebaseAPI {
     assert(user.uid == currentUser.uid);
     print(user.displayName);
     
-
     return currentUser;
   }
 
+  
+  static Future signOut(BuildContext context) async {
+    final user = await FirebaseAuth.instance.currentUser();
+    print(user.email);
+    await FirebaseAuth.instance.signOut();
+
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+        (Route<dynamic> route) => false);
+  }
 
 }

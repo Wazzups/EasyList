@@ -3,27 +3,39 @@ import 'package:meta/meta.dart';
 class Product {
   String documentId;
   String barcode;
+  int likes;
+  String local;
   String name;
-  String category;
+  String price;
   int discount;
+  String uid;
+  String userEmail;
 
   Product({
     @required this.documentId,
     @required this.barcode,
+    @required this.likes,
+    @required this.local,
     @required this.name,
-    @required this.category,
+    @required this.price,
     @required this.discount,
+    @required this.uid,
+    @required this.userEmail,
   });
 
   Map<String, dynamic> toJson() => {
         'barcode': barcode,
-        'name': name,
-        'category': category,
         'discount': discount,
+        'likes': likes,
+        'local': local,
+        'name': name,
+        'price': price,
+        'uid': uid,
+        'user': userEmail,        
       };
 
   @override
   String toString() {
-    return "Product $barcode is named $name";
+    return "Product $barcode named $name";
   }
 }

@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'package:easylist/ui/entry/entryPage.dart';
+import 'package:easylist/services/api_firebase.dart';
 import 'package:easylist/ui/home/constantsPopUpButton.dart';
 import 'package:easylist/ui/product/addBarcodeProduct_Screen.dart';
+import 'package:easylist/ui/product/productReadInfo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -56,7 +57,7 @@ class _MainHomeState extends State<MainHome> {
     }
   }
 
-  Future scan2() async {
+  Future scan() async {
     try {
       String barcode = await BarcodeScanner.scan();
       setState(() {
@@ -80,19 +81,19 @@ class _MainHomeState extends State<MainHome> {
   }
 
   Future scanning() async {
-    await scan2();
-    print("O barcode e " + barcode);
-    print("O this barcode e " + this.barcode);
+    await scan();
 
     Map _data = await apiFoodrepo.getFoodInfo(barcode);
     print(_data.toString());
     print(_data["data"][0]["barcode"]);
     print(_data["data"][0]["display_name_translations"]["en"]);
+    print(_data["data"][0]["images"][1]["thumb"]);
 
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => AddBarcodeProductScreen(
+        builder: (BuildContext context) => ProductReadPage(
             _data["data"][0]["barcode"],
-            _data["data"][0]["display_name_translations"]["en"])));
+            _data["data"][0]["display_name_translations"]["en"],
+            _data["data"][0]["images"][1]["thumb"])));
   }
 
   Widget _buildProductItem(BuildContext context, int index) {
@@ -105,6 +106,13 @@ class _MainHomeState extends State<MainHome> {
           children: <Widget>[
             new ListTile(
               onTap: () {},
+              trailing: IconButton(
+                icon: Icon(
+                  Icons.favorite,
+                  color: Colors.redAccent,
+                ),
+                onPressed: () {},
+              ),
               leading: new Hero(
                   tag: index,
                   child: CircleAvatar(
@@ -126,9 +134,12 @@ class _MainHomeState extends State<MainHome> {
               subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    new Text(product.category.toUpperCase()),
+                    new Text(product.local.toUpperCase()),
+                    Padding(
+                      padding: EdgeInsets.only(top: 2.0),
+                    ),
                     new Text(
-                      "Barcode " + product.barcode,
+                      "Price " + product.price + "€",
                       style: TextStyle(color: Colors.red),
                     ),
                   ]),
@@ -214,27 +225,17 @@ class _MainHomeState extends State<MainHome> {
     if (choice == ConstantsAppbar.Settings) {
       print('Settings');
     } else if (choice == ConstantsAppbar.SignOut) {
-      await _signOut();
+      await FirebaseAPI.signOut(context);
     }
   }
 
   void choiceActionFloatingButton(String choice) {
     if (choice == ConstantsFloatingButton.Manual) {
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) => AddBarcodeProductScreen("", "")));
+          builder: (BuildContext context) => AddProductScreen("", "")));
     } else if (choice == ConstantsFloatingButton.Barcode) {
       scanning();
     }
   }
 
-  Future _signOut() async {
-    final user = await FirebaseAuth.instance.currentUser();
-    print(user.email);
-    await FirebaseAuth.instance.signOut();
-
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (BuildContext context) => HomePage()),
-        (Route<dynamic> route) => false);
-  }
 }
