@@ -5,13 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easylist/ui/home/home.dart';
 import '../../services/api_products.dart';
-import 'package:numberpicker/numberpicker.dart';
 
 // * Pagina com o formulário para adicionar produtos
 class AddProductScreen extends StatefulWidget {
   final String barcode;
   final String productName;
-
   AddProductScreen(this.barcode, this.productName);
 
   @override
@@ -25,11 +23,18 @@ class _AddProductScreenState extends State<AddProductScreen> {
   GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _formState = new GlobalKey<FormState>();
   var format = new intl.DateFormat.yMMMMd("en_US");
+  List<String> _locations = <String>[
+    '',
+    'Pingo Doce',
+    'Lidl',
+    'Continente',
+    'Jumbo'
+  ];
   FirebaseUser firebaseUser;
   String productNameState;
   String barcodesState;
   String local = "";
-  double price = 1.0;
+  double price;
   int discount;
 
   @override
@@ -46,7 +51,43 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldState,
-      appBar: new AppBar(
+      appBar: appBarAddProduct(),
+      body: addProductBody(),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.redAccent,
+        child: Icon(Icons.done, color: Colors.white),
+        onPressed: () {
+          if (_formState.currentState.validate()) {
+            _formState.currentState.save();
+
+            Firestore.instance.runTransaction((transaction) async {
+              var dateTimeNowString = DateTime.now().toString();
+              await transaction
+                  .set(Firestore.instance.collection("products").document(), {
+                'name': productNameState,
+                'barcode': barcodesState,
+                'local': local,
+                'discount': discount,
+                'price': price,
+                'uid': firebaseUser.uid,
+                'user': firebaseUser.email,
+                'date': dateTimeNowString,
+              });
+            });
+
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        MainHome(ProductAPI(this.firebaseUser))),
+                (Route<dynamic> route) => false);
+          }
+        },
+      ),
+    );
+  }
+
+  AppBar appBarAddProduct() => AppBar(
         title: new Text("Add Product"),
         backgroundColor: Colors.redAccent,
         centerTitle: true,
@@ -56,153 +97,110 @@ class _AddProductScreenState extends State<AddProductScreen> {
             onPressed: () => _formState.currentState.reset(),
           )
         ],
-      ),
-      body: addProductBody(),
-      floatingActionButton: floatingActionProductAddButton(),
-    );
-  }
+      );
 
-  FloatingActionButton floatingActionProductAddButton() {
-    return new FloatingActionButton(
-      backgroundColor: Colors.redAccent,
-      child: new Icon(Icons.done, color: Colors.white),
-      onPressed: () {
-        if (_formState.currentState.validate()) {
-          _formState.currentState.save();
-
-          Firestore.instance.runTransaction((transaction) async {
-            var dateTimeNowString = format.format(DateTime.now());
-            await transaction
-                .set(Firestore.instance.collection("products").document(), {
-              'name': productNameState,
-              'barcode': barcodesState,
-              'local': local,
-              'discount': discount,
-              'price': price,
-              'uid': firebaseUser.uid,
-              'user': firebaseUser.email,
-              'date': dateTimeNowString,
-            });
-          });
-
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      MainHome(ProductAPI(this.firebaseUser))),
-              (Route<dynamic> route) => false);
-        }
-      },
-    );
-  }
-
-  Widget addProductBody() {
-    return ListView(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(top: 20.0),
-        ),
-        new Form(
-          child: Column(
-            children: <Widget>[
-              new ListTile(
-                leading: new Icon(
-                  Icons.label,
-                  color: Colors.red,
-                ),
-                title: new TextFormField(
-                    keyboardType: TextInputType.text,
-                    initialValue:
-                        productNameState != "" ? productNameState : "",
-                    validator: (value) =>
-                        value.isEmpty ? "Product Name Cannot be Empty" : null,
-                    onSaved: (value) => productNameState = value,
-                    maxLines: null,
-                    decoration: new InputDecoration(
-                        hintText: productNameState != ""
-                            ? "$productNameState"
-                            : "Product Name")),
-              ),
-              new ListTile(
-                leading: new Icon(
-                  FontAwesomeIcons.barcode,
-                  color: Colors.red,
-                ),
-                title: new TextFormField(
-                    keyboardType: TextInputType.number,
-                    initialValue: barcodesState != "" ? barcodesState : "",
-                    validator: (value) =>
-                        value.isEmpty ? "Barcode Cannot be Empty" : null,
-                    onSaved: (value) => barcodesState = value,
-                    maxLines: null,
-                    decoration: new InputDecoration(
-                        hintText: barcodesState != ""
-                            ? "$barcodesState"
-                            : "Barcode")),
-              ),
-              new ListTile(
-                leading: new Icon(
-                  Icons.location_on,
-                  color: Colors.red,
-                ),
-                title: new TextFormField(
-                    validator: (value) =>
-                        value.isEmpty ? "Local Cannot be Empty" : null,
-                    onSaved: (value) => local = value,
-                    maxLines: null,
-                    keyboardType: TextInputType.multiline,
-                    decoration: new InputDecoration(hintText: "Local")),
-              ),
-              new ListTile(
-                leading: new Icon(
-                  FontAwesomeIcons.percentage,
-                  color: Colors.red,
-                ),
-                title: new TextFormField(
-                    validator: (value) =>
-                        value.isEmpty ? "Discount Cannot be Empty" : null,
-                    onSaved: (value) => discount = int.parse(value),
-                    maxLines: null,
-                    keyboardType: TextInputType.number,
-                    decoration: new InputDecoration(hintText: "Discount")),
-              ),
-              new ListTile(
-                leading: new Icon(
-                  Icons.euro_symbol,
-                  color: Colors.red,
-                ),
-                title: new TextFormField(
-                    validator: (value) =>
-                        value.isEmpty ? "Price Cannot be Empty" : null,
-                    onSaved: (value) => price = value,
-                    maxLines: null,
-                    keyboardType: TextInputType.number,
-                    decoration: new InputDecoration(hintText: "Price")),
-              ),
-            ],
+  Widget addProductBody() => ListView(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(top: 20.0),
           ),
-          key: _formState,
-        ),
-      ],
-    );
-  }
-
-
- void _showDialog() {
-    showDialog<int>(
-      context: context,
-      builder: (BuildContext context) {
-        return new NumberPickerDialog.decimal(
-          minValue: 1,
-          maxValue: 10,
-          title: new Text("Pick a new price"),
-          initialDoubleValue: price,
-        );
-      }
-    ).then((int value)) {
-      if (value != null) {
-        setState(() => price = value);
-      }
-    });
-  }
+          new Form(
+            child: Column(
+              children: <Widget>[
+                new ListTile(
+                  leading: new Icon(
+                    Icons.label,
+                    color: Colors.red,
+                  ),
+                  title: new TextFormField(
+                      keyboardType: TextInputType.text,
+                      initialValue:
+                          productNameState != "" ? productNameState : "",
+                      validator: (value) =>
+                          value.isEmpty ? "Product Name Cannot be Empty" : null,
+                      onSaved: (value) => productNameState = value,
+                      maxLines: null,
+                      decoration: new InputDecoration(
+                          hintText: productNameState != ""
+                              ? "$productNameState"
+                              : "Product Name")),
+                ),
+                new ListTile(
+                  leading: new Icon(
+                    FontAwesomeIcons.barcode,
+                    color: Colors.red,
+                  ),
+                  title: new TextFormField(
+                      keyboardType: TextInputType.number,
+                      initialValue: barcodesState != "" ? barcodesState : "",
+                      validator: (value) =>
+                          value.isEmpty ? "Barcode Cannot be Empty" : null,
+                      onSaved: (value) => barcodesState = value,
+                      maxLines: null,
+                      decoration: new InputDecoration(
+                          hintText: barcodesState != ""
+                              ? "$barcodesState"
+                              : "Barcode")),
+                ),
+                new ListTile(
+                  leading: new Icon(
+                    Icons.location_on,
+                    color: Colors.red,
+                  ),
+                  title: new InputDecorator(
+                    decoration: const InputDecoration(
+                      hintText: 'Location',
+                    ),
+                    isEmpty: local == '',
+                    child: new DropdownButtonHideUnderline(
+                      child: new DropdownButton<String>(
+                        value: local,
+                        isDense: true,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            local = newValue;
+                          });
+                        },
+                        items: _locations.map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: new Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+                new ListTile(
+                  leading: new Icon(
+                    FontAwesomeIcons.percentage,
+                    color: Colors.red,
+                  ),
+                  title: new TextFormField(
+                      validator: (value) =>
+                          value.isEmpty ? "Discount Cannot be Empty" : null,
+                      onSaved: (value) => discount = int.parse(value),
+                      maxLines: null,
+                      keyboardType: TextInputType.number,
+                      decoration: new InputDecoration(hintText: "Discount")),
+                ),
+                new ListTile(
+                  leading: Icon(
+                    Icons.euro_symbol,
+                    color: Colors.red,
+                  ),
+                  title: new TextFormField(
+                      validator: (value) =>
+                          value.isEmpty ? "Price Cannot be Empty" : null,
+                      onSaved: (value) => price = double.parse(value),
+                      maxLines: null,
+                      keyboardType: TextInputType.number,
+                      decoration: new InputDecoration(hintText: "Price")),
+                ),
+              ],
+            ),
+            key: _formState,
+          ),
+        ],
+      );
 }

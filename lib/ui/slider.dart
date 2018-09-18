@@ -31,7 +31,7 @@ class _SliderPageState extends State<SliderPage> {
         title: "Barcode",
         description:
             "Barcode Scanner is the fastest and most user-friendly way to share discount products with the community",
-        pathImage: "assets/images/barcodescan.png",        
+        pathImage: "assets/images/barcodescan.png",
         widthImage: 200.0,
         heightImage: 200.0,
         marginDescription: EdgeInsets.only(top: 50.0),
@@ -52,24 +52,18 @@ class _SliderPageState extends State<SliderPage> {
     );
   }
 
-  void onDonePress() {
-    Navigator
-        .of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
-  }
+  void onDonePress() => Navigator
+      .of(context)
+      .push(MaterialPageRoute(builder: (BuildContext context) => EntryPage()));
 
-  void onSkipPress() {
-    Navigator
-        .of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) => HomePage()));
-  }
+  void onSkipPress() => Navigator
+      .of(context)
+      .push(MaterialPageRoute(builder: (BuildContext context) => EntryPage()));
 
   @override
-  Widget build(BuildContext context) {
-    return new IntroSlider(
-      slides: this.slides,
-      onDonePress: this.onDonePress,
-      onSkipPress: this.onSkipPress,
-    );
-  }
+  Widget build(BuildContext context) => IntroSlider(
+        slides: this.slides,
+        onDonePress: this.onDonePress,
+        onSkipPress: this.onSkipPress,
+      );
 }

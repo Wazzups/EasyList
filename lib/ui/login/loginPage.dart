@@ -1,11 +1,13 @@
+import 'package:easylist/models/users.dart';
+import 'package:easylist/services/api_user.dart';
 import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../home/home.dart';
 import '../../services/api_firebase.dart';
-import '../../services/api_firebaseUser.dart';
 import '../../services/api_products.dart';
 
+// * Pagina de autenticação
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -13,27 +15,30 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _loginFormKey = new GlobalKey<FormState>();
-  FirebaseAPIUser _firebaseAPIUser;
   String _email;
-  String _password;
+  String _password;  
+  List<User> _users = [];
 
   @override
   void initState() {
     super.initState();
   }
 
-  _loadFromFirebaseGoogle() async {
-    final user = await FirebaseAPI.signInWithGoogle();
-    debugPrint("Login GoogleUser UID = " + user.uid);
-    setState(() {
-      _firebaseAPIUser = FirebaseAPIUser(user);
-    });
-    if (user != null) {
+  _loginFirebaseGoogle() async {
+    final firebaseUser = await FirebaseAPI.signInWithGoogle();
+    debugPrint("GoogleUser Authenticated UID = " + firebaseUser.uid);
+    UserAPI userAPI = new UserAPI(firebaseUser);
+    _users = await userAPI.checkUserExist();
+    if (_users.length == 0) {
+      userAPI.addUserToFirestore();
+    }
+    print(_users.toString());
+    if (firebaseUser != null) {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) =>
-                  new MainHome(ProductAPI(user))));
+                  new MainHome(ProductAPI(firebaseUser))));
     }
   }
 
@@ -48,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
 
   String _passwordValidation(String value) {
     if (value.length < 8) return 'The Password must be at least 8 characters.';
-
     return null;
   }
 
@@ -75,11 +79,6 @@ class _LoginPageState extends State<LoginPage> {
         AlertDialog();
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: loginPage(context));
   }
 
   Widget loginPage(BuildContext context) {
@@ -144,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   new Expanded(
                     child: TextFormField(
+                      keyboardType: TextInputType.number,
                       textAlign: TextAlign.left,
                       decoration: InputDecoration(
                         icon: Icon(
@@ -200,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   new Expanded(
                     child: TextFormField(
-                      keyboardType: TextInputType.emailAddress,
+                      keyboardType: TextInputType.text,
                       obscureText: true,
                       textAlign: TextAlign.left,
                       decoration: InputDecoration(
@@ -325,7 +325,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       FlatButton(
-                        onPressed: () => _loadFromFirebaseGoogle(),
+                        onPressed: () => _loginFirebaseGoogle(),
                         padding: EdgeInsets.only(
                           top: 15.0,
                           bottom: 15.0,
@@ -359,5 +359,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: loginPage(context));
   }
 }

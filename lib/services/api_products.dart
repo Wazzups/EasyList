@@ -17,9 +17,18 @@ class ProductAPI {
         .toList();
   }
 
+  Future<List<Product>> getAllProductsFromUserAuth() async {
+    return (await Firestore.instance.collection('products').getDocuments())
+        .documents
+        .where((snapshot) =>
+            snapshot.data["uid"] == firebaseUser.uid)
+        .map((snapshot) => _fromDocumentSnapshot(snapshot))
+        .toList();
+  }
+
   StreamSubscription watch(Product product, void onChange(Product product)) {
     return Firestore.instance
-        .collection('cats')
+        .collection('products')
         .document(product.documentId)
         .snapshots()
         .listen((snapshot) => onChange(_fromDocumentSnapshot(snapshot)));
@@ -38,6 +47,7 @@ class ProductAPI {
       discount: data["discount"],
       uid: data["uid"],
       userEmail: data["user"],
+      date: data["date"]
     );
   }
 }

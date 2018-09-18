@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../login/loginPage.dart';
 import '../register/registerPage.dart';
 
-class HomePage extends StatelessWidget {
+// * Pagina de entrada principal
+class EntryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: homePage(context),

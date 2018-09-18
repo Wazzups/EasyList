@@ -1,10 +1,11 @@
 import 'package:easylist/services/api_todo.dart';
 import 'package:easylist/ui/profile/profilePage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:easylist/ui/todo/todoMain.dart';
 import 'package:flutter/material.dart';
 import 'package:easylist/services/api_firebase.dart';
 import '../../services/api_products.dart';
-import '../about/aboutUsPage.dart';
+import '../about/aboutPage.dart';
 
 class SideDrawer extends StatefulWidget {
   final ProductAPI productApi;
@@ -25,6 +26,14 @@ class _SideDrawerState extends State<SideDrawer> {
     super.initState();
   }
 
+  void showColoredToast() {
+    Fluttertoast.showToast(
+        msg: "This is Colored Toast",
+        toastLength: Toast.LENGTH_SHORT,
+        bgcolor: "#e74c3c",
+        textcolor: '#ffffff'
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return new Drawer(
@@ -50,6 +59,17 @@ class _SideDrawerState extends State<SideDrawer> {
             ),
             title: Text(
               "Home",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+            onTap: () => Navigator.pop(context),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.favorite,
+              color: Colors.redAccent,
+            ),
+            title: Text(
+              "Favorite",
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
             onTap: () => Navigator.pop(context),
@@ -92,7 +112,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 style:
                     TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => AboutUsScreen())),
+                builder: (BuildContext context) => AboutPage())),
           ),
         ],
       ),

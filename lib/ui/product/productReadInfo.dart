@@ -16,12 +16,12 @@ class ProductReadPage extends StatefulWidget {
 }
 
 class _ProductReadPageState extends State<ProductReadPage> {
-  String barcodesState;
-  String productNameState;
-  String productImageUrlState;
+  String _barcodesState;
+  String _productNameState;
+  String _productImageUrlState;
 
   _ProductReadPageState(
-      this.barcodesState, this.productNameState, this.productImageUrlState);
+      this._barcodesState, this._productNameState, this._productImageUrlState);
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _ProductReadPageState extends State<ProductReadPage> {
           Column(
             children: <Widget>[
               CircleAvatar(
-                backgroundImage: NetworkImage(this.productImageUrlState),
+                backgroundImage: NetworkImage(this._productImageUrlState),
                 foregroundColor: Colors.black,
                 radius: 85.0,
               ),
@@ -75,7 +75,7 @@ class _ProductReadPageState extends State<ProductReadPage> {
           ),
           ListTile(
               title: Text(
-                this.productNameState,
+                this._productNameState,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 22.0,
@@ -89,7 +89,7 @@ class _ProductReadPageState extends State<ProductReadPage> {
                 onPressed: () {},
               )),
           ListTile(
-            title: Text(this.barcodesState),
+            title: Text(this._barcodesState),
             subtitle: Text("Barcode value"),
           ),
           ListTile(
@@ -111,7 +111,7 @@ class _ProductReadPageState extends State<ProductReadPage> {
       backgroundColor: Colors.red,
       onPressed: () => Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) =>
-              AddProductScreen(this.barcodesState, this.productNameState))),
+              AddProductScreen(this._barcodesState, this._productNameState))),
     );
   }
 }

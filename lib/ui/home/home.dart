@@ -1,21 +1,21 @@
 import 'dart:async';
-import 'package:easylist/services/api_firebase.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easylist/ui/home/constantsPopUpButton.dart';
 import 'package:easylist/ui/product/addProductPage.dart';
 import 'package:easylist/ui/product/productReadInfo.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'drawer.dart';
 import '../../services/api_foodrepo.dart';
 import '../../models/product.dart';
-import 'drawer.dart';
 import '../../services/api_products.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/services.dart';
 
 class MainHome extends StatefulWidget {
-  final ProductAPI productApi;
   MainHome(this.productApi);
+
+  final ProductAPI productApi;
 
   @override
   _MainHomeState createState() => _MainHomeState(this.productApi);
@@ -24,20 +24,32 @@ class MainHome extends StatefulWidget {
 class _MainHomeState extends State<MainHome> {
   _MainHomeState(this._productApiListener);
 
-  List<Product> _products = [];
-  ProductAPI _productApiListener;
-  FirebaseUser user;
-  String barcode = "";
   APIFoodrepo apiFoodrepo = new APIFoodrepo();
+  ProductAPI _productApiListener;
+  List<Product> _products = [];
+  FirebaseUser user;
+  String _barcode = "";
+  int _choice = 1;
 
   @override
   initState() {
     super.initState();
-    _loadFromFirebase();
+    _loadAllProducts();
   }
 
-  _loadFromFirebase() async {
+  // * Load de todos os produtos
+  _loadAllProducts() async {
     final products = await _productApiListener.getAllProducts();
+    products.sort((b, a) => a.date.compareTo(b.date));
+    setState(() {
+      _products = products;
+    });
+  }
+
+  // * Load do produtos adicionados pelo utilizador autenticado
+  _loadHistoryProducts() async {
+    final products = await _productApiListener.getAllProductsFromUserAuth();
+    products.sort((b, a) => a.date.compareTo(b.date));
     setState(() {
       _products = products;
     });
@@ -48,42 +60,21 @@ class _MainHomeState extends State<MainHome> {
     return new Future<Null>.value();
   }
 
+  // * Faz reload dependendo da escolha
   _reloadProducts() async {
     if (_productApiListener != null) {
-      final products = await _productApiListener.getAllProducts();
-      setState(() {
-        _products = products;
-      });
-    }
-  }
-
-  Future scan() async {
-    try {
-      String barcode = await BarcodeScanner.scan();
-      setState(() {
-        this.barcode = barcode;
-        debugPrint("Barcode: $barcode");
-      });
-    } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-          this.barcode = 'The user did not grant the camera permission!';
-        });
-      } else {
-        setState(() => this.barcode = 'Unknown error: $e');
+      if (_choice == 1) {
+        _loadAllProducts();
+      } else if (_choice == 2) {
+        _loadHistoryProducts();
       }
-    } on FormatException {
-      setState(() => this.barcode =
-          'null (User returned using the "back"-button before scanning anything. Result)');
-    } catch (e) {
-      setState(() => this.barcode = 'Unknown error: $e');
     }
   }
 
   Future scanning() async {
     await scan();
 
-    Map _data = await apiFoodrepo.getFoodInfo(barcode);
+    Map _data = await apiFoodrepo.getFoodInfo(this._barcode);
     print(_data.toString());
     print(_data["data"][0]["barcode"]);
     print(_data["data"][0]["display_name_translations"]["en"]);
@@ -139,7 +130,7 @@ class _MainHomeState extends State<MainHome> {
                       padding: EdgeInsets.only(top: 2.0),
                     ),
                     new Text(
-                      "Price " + product.price + "€",
+                      "Price " + product.price.toString() + "€",
                       style: TextStyle(color: Colors.red),
                     ),
                   ]),
@@ -173,9 +164,22 @@ class _MainHomeState extends State<MainHome> {
         ),
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: choiceActionAppBar,
+            onSelected: choiceActionFilter,
+            icon: Icon(Icons.filter_list),
             itemBuilder: (BuildContext context) {
-              return ConstantsAppbar.choices.map((String choice) {
+              return ConstantsFilter.choices.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+          PopupMenuButton<String>(
+            onSelected: choiceActionOrder,
+            icon: Icon(Icons.sort),
+            itemBuilder: (BuildContext context) {
+              return ConstantsOrder.choices.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -221,15 +225,29 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-  void choiceActionAppBar(String choice) async {
-    if (choice == ConstantsAppbar.Settings) {
-      print('Settings');
-    } else if (choice == ConstantsAppbar.SignOut) {
-      await FirebaseAPI.signOut(context);
+  choiceActionFilter(String choice) {
+    if (choice == ConstantsFilter.History) {
+      _loadHistoryProducts();
+      _choice = 2;
+    } else if (choice == ConstantsFilter.All) {
+      _loadAllProducts();
+      _choice = 1;
     }
   }
 
-  void choiceActionFloatingButton(String choice) {
+  choiceActionOrder(String choice) {
+    if (choice == ConstantsOrder.Location) {
+      setState(() {
+        _products.sort((a, b) => a.local.compareTo(b.local));
+      });
+    } else if (choice == ConstantsOrder.Price) {
+      setState(() {
+        _products.sort((a, b) => a.price.compareTo(b.price));
+      });
+    }
+  }
+
+  choiceActionFloatingButton(String choice) {
     if (choice == ConstantsFloatingButton.Manual) {
       Navigator.of(context).push(MaterialPageRoute(
           builder: (BuildContext context) => AddProductScreen("", "")));
@@ -238,4 +256,26 @@ class _MainHomeState extends State<MainHome> {
     }
   }
 
+  Future scan() async {
+    try {
+      String barcode = await BarcodeScanner.scan();
+      setState(() {
+        this._barcode = barcode;
+        debugPrint("Barcode: $barcode");
+      });
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this._barcode = 'The user did not grant the camera permission!';
+        });
+      } else {
+        setState(() => this._barcode = 'Unknown error: $e');
+      }
+    } on FormatException {
+      setState(() => this._barcode =
+          'null (User returned using the "back"-button before scanning anything. Result)');
+    } catch (e) {
+      setState(() => this._barcode = 'Unknown error: $e');
+    }
+  }
 }

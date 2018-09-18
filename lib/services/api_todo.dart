@@ -10,8 +10,11 @@ class ToDoAPI {
     this.firebaseUser = user;
   }
 
-   Future<List<Todo>> getAllTodo() async {
-    return (await Firestore.instance.collection('todo').getDocuments()).documents.where((snapshot) => snapshot.data["email"] == "pedromespadinha95@gmail.com")
+  Future<List<Todo>> getAllTodo() async {
+    return (await Firestore.instance.collection('todo').getDocuments())
+        .documents
+        .where((snapshot) =>
+            snapshot.data["uid"] == firebaseUser.uid)
         .map((snapshot) => _fromDocumentSnapshot(snapshot))
         .toList();
   }

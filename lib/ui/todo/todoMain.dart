@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easylist/models/todo.dart';
-import 'package:easylist/ui/entry/entryPage.dart';
-import 'package:easylist/ui/home/constantsPopUpButton.dart';
 import 'package:easylist/ui/todo/todoaddPage.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/api_todo.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -24,9 +21,8 @@ class _ToDoMainState extends State<ToDoMain> {
   ToDoAPI _todoApiListener;
   String todotitle;
   List<String> todoslist = [];
-  String deletetodo;
-
   List<Todo> _toDos = [];
+  String deletetodo;
 
   @override
   initState() {
@@ -59,7 +55,7 @@ class _ToDoMainState extends State<ToDoMain> {
   Widget _buildTodosItem(BuildContext context, int index) {
     Todo toDos = _toDos[index];
     return new Card(
-      color: Colors.redAccent.shade100,
+      color: Colors.redAccent,
       child: ListTile(
         onTap: (){
           Navigator.push(
@@ -80,7 +76,7 @@ class _ToDoMainState extends State<ToDoMain> {
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
             IconButton(
-              icon: Icon(Icons.delete_forever),
+              icon: Icon(Icons.delete_forever, color: Colors.white, size: 30.0,),
               onPressed: () {
                 setState(() {
                   deletetodo = toDos.documentId;
@@ -91,7 +87,7 @@ class _ToDoMainState extends State<ToDoMain> {
             )
           ],
         ),
-        subtitle: Text("Date created: " + toDos.date),
+        subtitle: Text("Date: " + toDos.date),
       ),
     );
   }
@@ -116,7 +112,7 @@ class _ToDoMainState extends State<ToDoMain> {
                 },
                 autofocus: true,
                 decoration: new InputDecoration(
-                    labelText: 'Full Name', hintText: 'eg. John Smith'),
+                    labelText: 'Full Description', hintText: 'eg. Food'),
               ),
             ))
           ],
@@ -128,7 +124,7 @@ class _ToDoMainState extends State<ToDoMain> {
                 Navigator.pop(context);
               }),
           new FlatButton(
-            child: const Text('OPEN'),
+            child: const Text('ADD'),
             onPressed: _addToDoFirestore,
           )
         ],
@@ -168,7 +164,7 @@ class _ToDoMainState extends State<ToDoMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("EasyList"),
+        title: Text("Tasks"),
         centerTitle: true,
         backgroundColor: Colors.redAccent,
         actions: <Widget>[

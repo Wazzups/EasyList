@@ -1,19 +1,20 @@
-class ConstantsAppbar{
-  static const String Settings = 'Settings';
-  static const String SignOut = 'Sign out';
+class ConstantsFilter {
+  static const String History = 'History';
+  static const String All = 'All';
 
-  static const List<String> choices = <String>[
-    Settings,
-    SignOut
-  ];
+  static const List<String> choices = <String>[All, History];
 }
 
-class ConstantsFloatingButton{
+class ConstantsOrder {
+  static const String Price = 'Sort by Price';
+  static const String Location = 'Sort by Location';
+
+  static const List<String> choices = <String>[Price, Location];
+}
+
+class ConstantsFloatingButton {
   static const String Manual = 'Manual';
   static const String Barcode = 'Barcode';
 
-  static const List<String> choices = <String>[
-    Barcode,
-    Manual
-  ];
+  static const List<String> choices = <String>[Barcode, Manual];
 }

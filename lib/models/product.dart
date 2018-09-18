@@ -6,10 +6,11 @@ class Product {
   int likes;
   String local;
   String name;
-  String price;
+  double price;
   int discount;
   String uid;
   String userEmail;
+  String date;
 
   Product({
     @required this.documentId,
@@ -21,6 +22,7 @@ class Product {
     @required this.discount,
     @required this.uid,
     @required this.userEmail,
+    @required this.date,
   });
 
   Map<String, dynamic> toJson() => {
@@ -31,7 +33,8 @@ class Product {
         'name': name,
         'price': price,
         'uid': uid,
-        'user': userEmail,        
+        'user': userEmail,   
+        'date': date,       
       };
 
   @override
