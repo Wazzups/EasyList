@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:easylist/models/users.dart';
+import 'package:easylist/services/api_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -28,14 +30,26 @@ class _MainHomeState extends State<MainHome> {
   ProductAPI _productApiListener;
   List<Product> _products = [];
   FirebaseUser user;
+  UserAPI _userAPI;
   String _barcode = "";
   int _choice = 1;
+  List<User> _users = [];
 
   @override
   initState() {
     super.initState();
-    _loadAllProducts();
+    loadUserData();
+    _loadAllProducts(); 
   }
+
+  loadUserData() async{
+    var userAPI = new UserAPI(this._productApiListener.firebaseUser);
+    var users = await userAPI.getUserAuthData();
+    setState(() {
+          _users = users;
+          _userAPI = userAPI;
+        });
+    }
 
   // * Load de todos os produtos
   _loadAllProducts() async {
@@ -102,7 +116,9 @@ class _MainHomeState extends State<MainHome> {
                   Icons.favorite,
                   color: Colors.redAccent,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  _userAPI.userlikeNumber(product.uid);
+                },
               ),
               leading: new Hero(
                   tag: index,

@@ -64,17 +64,6 @@ class _SideDrawerState extends State<SideDrawer> {
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
-            leading: Icon(
-              Icons.favorite,
-              color: Colors.redAccent,
-            ),
-            title: Text(
-              "Favorite",
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-            onTap: () => Navigator.pop(context),
-          ),
-          ListTile(
             leading: Icon(Icons.assignment, color: Colors.redAccent),
             title: Text(
               "ToDo",
@@ -96,7 +85,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 context,
                 MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        ProfilePage(_productApiListener.firebaseUser))),
+                        ProfilePage(this._productApiListener.firebaseUser))),
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app, color: Colors.redAccent),

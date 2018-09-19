@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easylist/models/todo.dart';
+import 'package:easylist/services/api_user.dart';
 import 'package:easylist/ui/todo/todoaddPage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../services/api_todo.dart';
 import 'package:intl/intl.dart' as intl;
@@ -23,11 +25,19 @@ class _ToDoMainState extends State<ToDoMain> {
   List<String> todoslist = [];
   List<Todo> _toDos = [];
   String deletetodo;
+  UserAPI userAPI;
+  FirebaseUser firebaseUser;
 
   @override
   initState() {
     super.initState();
     _loadFromFirebase();
+    loadCurrentFirebaseUser();
+  }
+
+  loadCurrentFirebaseUser() async {
+    this.firebaseUser = await FirebaseAuth.instance.currentUser();
+    userAPI = new UserAPI(this.firebaseUser);
   }
 
   _loadFromFirebase() async {
@@ -39,7 +49,6 @@ class _ToDoMainState extends State<ToDoMain> {
 
   Future<Null> refresh() {
     _reloadProducts();
-    _deleteToDoFirestore(this.deletetodo);
     return new Future<Null>.value();
   }
 
@@ -55,14 +64,14 @@ class _ToDoMainState extends State<ToDoMain> {
   Widget _buildTodosItem(BuildContext context, int index) {
     Todo toDos = _toDos[index];
     return new Card(
-      color: Colors.redAccent,
+      color: Colors.redAccent.shade100,
       child: ListTile(
-        onTap: (){
+        onTap: () {
           Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            new ToDoSecondMain(toDos.documentId)));
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      new ToDoSecondMain(toDos)));
         },
         leading: CircleAvatar(
           backgroundColor: Colors.redAccent,
@@ -76,14 +85,12 @@ class _ToDoMainState extends State<ToDoMain> {
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
             IconButton(
-              icon: Icon(Icons.delete_forever, color: Colors.white, size: 30.0,),
-              onPressed: () {
-                setState(() {
-                  deletetodo = toDos.documentId;
-                });
-
-                debugPrint(this.deletetodo);
-              },
+              icon: Icon(
+                Icons.delete_forever,
+                color: Colors.white,
+                size: 30.0,
+              ),
+              onPressed: () => _deleteToDoFirestore(toDos.documentId),
             )
           ],
         ),
@@ -147,10 +154,14 @@ class _ToDoMainState extends State<ToDoMain> {
           'date': dateString,
           'todos': todoslist,
           'email': _todoApiListener.firebaseUser.email,
+          'uid': firebaseUser.uid,
         });
       });
+      userAPI.userincrementTodoNumber(1);
+      refresh();
       Navigator.of(context).pop();
     }
+    
   }
 
   _deleteToDoFirestore(String documentId) {
@@ -158,6 +169,8 @@ class _ToDoMainState extends State<ToDoMain> {
       await transaction
           .delete(Firestore.instance.collection("todo").document(documentId));
     });
+    userAPI.userincrementTodoNumber(2);
+    refresh();
   }
 
   @override
@@ -167,14 +180,6 @@ class _ToDoMainState extends State<ToDoMain> {
         title: Text("Tasks"),
         centerTitle: true,
         backgroundColor: Colors.redAccent,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              debugPrint(_c.toString());
-            },
-          )
-        ],
       ),
       body: new Container(
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),

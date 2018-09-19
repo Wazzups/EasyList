@@ -4,19 +4,19 @@ import 'package:easylist/models/todo.dart';
 import 'package:flutter/material.dart';
 
 class ToDoSecondMain extends StatefulWidget {
-  final String todoDocumentId;
-  ToDoSecondMain(this.todoDocumentId);
+  final Todo todo;
+  ToDoSecondMain(this.todo);
 
   @override
-  _ToDoSecondMainState createState() =>
-      _ToDoSecondMainState(this.todoDocumentId);
+  _ToDoSecondMainState createState() => _ToDoSecondMainState(this.todo);
 }
 
 class _ToDoSecondMainState extends State<ToDoSecondMain> {
-  _ToDoSecondMainState(this._todoDocumentIdListener);
+  _ToDoSecondMainState(this._todoListener);
 
-  String _todoDocumentIdListener;
-  String todotitle;
+  GlobalKey<FormState> _formState = new GlobalKey<FormState>();
+  Todo _todoListener;
+  String _taskTitle;
   List<String> todoslist = [];
   String deletetodo;
 
@@ -43,7 +43,7 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
   StreamSubscription watch(Todo todo, void onChange(Todo todo)) {
     return Firestore.instance
         .collection('todo')
-        .document(_todoDocumentIdListener)
+        .document(_todoListener.documentId)
         .snapshots()
         .listen((snapshot) => onChange(_fromDocumentSnapshot(snapshot)));
   }
@@ -51,7 +51,7 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
   Future<DocumentSnapshot> getTodoPicked() async {
     return (await Firestore.instance
         .collection('todo')
-        .document(_todoDocumentIdListener)
+        .document(_todoListener.documentId)
         .get());
   }
 
@@ -73,12 +73,86 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
     final snapshot = await getTodoPicked();
     final toDo = _fromDocumentSnapshot(snapshot);
     setState(() {
-      _toDo = toDo;
+      _todoListener = toDo;
     });
   }
 
+  
+  _showDialog() async {
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+                child: Form(
+              key: _formState,
+              child: new TextFormField(
+                validator: (value) {
+                  var msg = value.isEmpty ? "Tittle Cannot be Empty" : null;
+                  return msg;
+                },
+                onSaved: (String value) {
+                  this._taskTitle = value;
+                },
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Full Description', hintText: 'eg. Bolachas'),
+              ),
+            ))
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+            child: const Text('ADD'),
+            onPressed: _addTaskToFirestore,
+          )
+        ],
+      ),
+    );
+  }
+  
+  _addTaskToFirestore() {
+    if (_formState.currentState.validate()) {
+      _formState.currentState.save();
+      print(this._taskTitle);
+      var tasks = _todoListener.todos;
+      tasks.add(_taskTitle);
+
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction
+            .update(Firestore.instance.collection("todo").document(_todoListener.documentId), {
+          'todos': tasks,
+        });
+      });
+      Navigator.of(context).pop();
+      refresh();
+    }
+  }
+  
+  _removeTaskToFirestore(String task) {
+  
+      var tasks = _todoListener.todos;
+      tasks.remove(task);
+
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction
+            .update(Firestore.instance.collection("todo").document(_todoListener.documentId), {
+          'todos': tasks,
+        });
+      });
+      refresh();
+    
+  }
+
   Widget _buildTodosItem(BuildContext context, int index) {
-    String toDos = _toDo.todos[index];
+    String toDos = _todoListener.todos[index];
     return new Card(
       color: Colors.redAccent.shade100,
       child: ListTile(
@@ -91,8 +165,8 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
               style: TextStyle(fontWeight: FontWeight.bold),
             )),
             IconButton(
-              icon: Icon(Icons.delete_forever),
-              onPressed: () {},
+              icon: Icon(Icons.delete_forever, color: Colors.white,),
+              onPressed: ()=> _removeTaskToFirestore(toDos),
             )
           ],
         ),
@@ -104,17 +178,10 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("EasyList"),
+        title: Text("Tasks"),
         centerTitle: true,
         backgroundColor: Colors.redAccent,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              debugPrint(_toDo.date);
-            },
-          )
-        ],
+        
       ),
       body: new Container(
         margin: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -125,7 +192,7 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
                     onRefresh: refresh,
                     child: new ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: _toDo.todos.length,
+                        itemCount: _todoListener.todos.length,
                         itemBuilder: _buildTodosItem)))
           ],
         ),
@@ -135,7 +202,7 @@ class _ToDoSecondMainState extends State<ToDoSecondMain> {
         tooltip: "Add Todo",
         mini: true,
         backgroundColor: Colors.redAccent,
-        onPressed: () {},
+        onPressed: _showDialog,
       ),
     );
   }

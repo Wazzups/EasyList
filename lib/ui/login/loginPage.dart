@@ -28,9 +28,9 @@ class _LoginPageState extends State<LoginPage> {
     final firebaseUser = await FirebaseAPI.signInWithGoogle();
     debugPrint("GoogleUser Authenticated UID = " + firebaseUser.uid);
     UserAPI userAPI = new UserAPI(firebaseUser);
-    _users = await userAPI.checkUserExist();
+    _users = await userAPI.getUserAuthData();
     if (_users.length == 0) {
-      userAPI.addUserToFirestore();
+      userAPI.addNewUserToFirestore();
     }
     print(_users.toString());
     if (firebaseUser != null) {

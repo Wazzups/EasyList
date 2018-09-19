@@ -1,8 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:easylist/services/api_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+// * Página de perfil do user autenticado
 class ProfilePage extends StatefulWidget {
-  FirebaseUser firebaseUser;
+  final FirebaseUser firebaseUser;
   ProfilePage(this.firebaseUser);
 
   @override
@@ -10,12 +12,28 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  FirebaseUser firebaseUserListener;
-  _ProfilePageState(this.firebaseUserListener);
+  FirebaseUser _firebaseUserListener;
+  _ProfilePageState(this._firebaseUserListener);
+  int _likes;
+  int _posts;
+  int _todos;
 
   @override
   void initState() {
     super.initState();
+    loadUserData();
+  }
+
+  //* retorna o utiliador logado do firestore e atribui as variaveis de perfil
+  loadUserData() async {
+    FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    var userAPI = new UserAPI(firebaseUser);
+    var users = await userAPI.getUserAuthData();
+    setState(() {
+      _likes = users[0].likes;
+      _posts = users[0].posts;
+      _todos = users[0].todos;
+    });
   }
 
   Widget profileColumn() => ListView(children: <Widget>[
@@ -40,8 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     child: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(firebaseUserListener.photoUrl),
+                      backgroundImage:NetworkImage(_firebaseUserListener.photoUrl),
                       foregroundColor: Colors.black,
                       radius: 40.0,
                     ),
@@ -52,14 +69,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 padding: EdgeInsets.only(top: 10.0),
               ),
               Text(
-                firebaseUserListener.displayName,
+                _firebaseUserListener.displayName,
                 style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.white,
                     fontWeight: FontWeight.bold),
               ),
               Text(
-                firebaseUserListener.email,
+                _firebaseUserListener.email,
                 style: TextStyle(fontSize: 14.0, color: Colors.white),
               ),
               Padding(
@@ -80,8 +97,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 35.0,
               ),
               title: Text(
-                "16",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                _posts == null ? "loading..." : "$_posts",
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               subtitle: Text("Posts"),
             ),
@@ -92,22 +110,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 35.0,
               ),
               title: Text(
-                "2.5",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                _likes == null ? "loading..." : "$_likes",
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               subtitle: Text("Likes"),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.favorite,
-                color: Colors.redAccent,
-                size: 35.0,
-              ),
-              title: Text(
-                "10",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
-              ),
-              subtitle: Text("Raking"),
             ),
             ListTile(
               leading: Icon(
@@ -116,34 +123,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 35.0,
               ),
               title: Text(
-                "10",
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                _todos == null ? "loading..." : "$_todos",
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
               ),
               subtitle: Text("ToDos"),
             )
           ],
         )
       ]);
-
-  Widget followColumn() => Container(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            ListTile(
-              title: Text("1.6k"),
-              subtitle: Text("dsa"),
-            ),
-            ListTile(
-              title: Text("2.5K"),
-              subtitle: Text("Followers"),
-            ),
-            ListTile(
-              title: Text("10K"),
-              subtitle: Text("10K"),
-            )
-          ],
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {

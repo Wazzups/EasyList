@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:easylist/services/api_user.dart';
 import 'package:easylist/ui/home/home.dart';
 import '../../services/api_products.dart';
 
 // * Pagina com o formulário para adicionar produtos
 class AddProductScreen extends StatefulWidget {
+  AddProductScreen(this.barcode, this.productName);
   final String barcode;
   final String productName;
-  AddProductScreen(this.barcode, this.productName);
 
   @override
   _AddProductScreenState createState() =>
@@ -18,11 +18,11 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  _AddProductScreenState(this.barcodesState, this.productNameState);
+  _AddProductScreenState(this._barcodesState, this._productNameState);
 
   GlobalKey<ScaffoldState> _scaffoldState = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _formState = new GlobalKey<FormState>();
-  var format = new intl.DateFormat.yMMMMd("en_US");
+  UserAPI userAPI;
   List<String> _locations = <String>[
     '',
     'Pingo Doce',
@@ -31,11 +31,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
     'Jumbo'
   ];
   FirebaseUser firebaseUser;
-  String productNameState;
-  String barcodesState;
-  String local = "";
-  double price;
-  int discount;
+  String _productNameState;
+  String _barcodesState;
+  String _local = "";
+  double _price;
+  int _discount;
 
   @override
   void initState() {
@@ -43,8 +43,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     super.initState();
   }
 
+  
   loadCurrentFirebaseUser() async {
     this.firebaseUser = await FirebaseAuth.instance.currentUser();
+    userAPI = new UserAPI(this.firebaseUser);
   }
 
   @override
@@ -64,16 +66,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
               var dateTimeNowString = DateTime.now().toString();
               await transaction
                   .set(Firestore.instance.collection("products").document(), {
-                'name': productNameState,
-                'barcode': barcodesState,
-                'local': local,
-                'discount': discount,
-                'price': price,
+                'name': _productNameState,
+                'barcode': _barcodesState,
+                'local': _local,
+                'discount': _discount,
+                'price': _price,
                 'uid': firebaseUser.uid,
                 'user': firebaseUser.email,
                 'date': dateTimeNowString,
               });
             });
+            userAPI.userincrementPostNumber(1);
 
             Navigator.pushAndRemoveUntil(
                 context,
@@ -115,14 +118,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   title: new TextFormField(
                       keyboardType: TextInputType.text,
                       initialValue:
-                          productNameState != "" ? productNameState : "",
+                          _productNameState != "" ? _productNameState : "",
                       validator: (value) =>
                           value.isEmpty ? "Product Name Cannot be Empty" : null,
-                      onSaved: (value) => productNameState = value,
+                      onSaved: (value) => _productNameState = value,
                       maxLines: null,
                       decoration: new InputDecoration(
-                          hintText: productNameState != ""
-                              ? "$productNameState"
+                          hintText: _productNameState != ""
+                              ? "$_productNameState"
                               : "Product Name")),
                 ),
                 new ListTile(
@@ -132,14 +135,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                   title: new TextFormField(
                       keyboardType: TextInputType.number,
-                      initialValue: barcodesState != "" ? barcodesState : "",
+                      initialValue: _barcodesState != "" ? _barcodesState : "",
                       validator: (value) =>
                           value.isEmpty ? "Barcode Cannot be Empty" : null,
-                      onSaved: (value) => barcodesState = value,
+                      onSaved: (value) => _barcodesState = value,
                       maxLines: null,
                       decoration: new InputDecoration(
-                          hintText: barcodesState != ""
-                              ? "$barcodesState"
+                          hintText: _barcodesState != ""
+                              ? "$_barcodesState"
                               : "Barcode")),
                 ),
                 new ListTile(
@@ -151,14 +154,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Location',
                     ),
-                    isEmpty: local == '',
+                    isEmpty: _local == '',
                     child: new DropdownButtonHideUnderline(
                       child: new DropdownButton<String>(
-                        value: local,
+                        value: _local,
                         isDense: true,
                         onChanged: (String newValue) {
                           setState(() {
-                            local = newValue;
+                            _local = newValue;
                           });
                         },
                         items: _locations.map((String value) {
@@ -179,7 +182,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   title: new TextFormField(
                       validator: (value) =>
                           value.isEmpty ? "Discount Cannot be Empty" : null,
-                      onSaved: (value) => discount = int.parse(value),
+                      onSaved: (value) => _discount = int.parse(value),
                       maxLines: null,
                       keyboardType: TextInputType.number,
                       decoration: new InputDecoration(hintText: "Discount")),
@@ -192,7 +195,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   title: new TextFormField(
                       validator: (value) =>
                           value.isEmpty ? "Price Cannot be Empty" : null,
-                      onSaved: (value) => price = double.parse(value),
+                      onSaved: (value) => _price = double.parse(value),
                       maxLines: null,
                       keyboardType: TextInputType.number,
                       decoration: new InputDecoration(hintText: "Price")),
